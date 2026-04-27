@@ -44,11 +44,11 @@ Proyek ini dikembangkan oleh:
 
 ## 🗂️ Struktur Sistem
 
-### 🔄 Data Flow Diagram (DFD)
+### 🔄 ...
 
-### 🧺 Entity Relationship Diagram (ERD)
+### 🧺 ...
 
-### 🗄️ Database
+### 🗄️ ...
 
 ---
 
