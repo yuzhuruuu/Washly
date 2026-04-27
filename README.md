@@ -19,7 +19,7 @@ Proyek ini dikembangkan oleh:
 - Ananda Khairu  A
   📧 anandakhairu3108@students.unnes.ac.id
 
-- Annisa Yusri N R  
+- Annisa Yusri N R
   📧 yusriannisa@students.unnes.ac.id 
 
 - Fathimah Shaffa  A
