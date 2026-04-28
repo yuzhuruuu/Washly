@@ -1,7 +1,7 @@
-# 🧺 Laundry Booking System (Web-Based)
+# 🧺 Washly - Laundry Booking System (Web-Based)
 
 ## 📌 Deskripsi Proyek
-Laundry Booking System adalah aplikasi berbasis web yang dirancang untuk membantu digitalisasi layanan laundry UMKM. Sistem ini memungkinkan pelanggan melakukan pemesanan layanan laundry secara online serta memudahkan admin dalam mengelola pesanan.
+Washly adalah aplikasi berbasis web yang dirancang untuk membantu digitalisasi layanan laundry UMKM. Sistem ini memungkinkan pelanggan melakukan pemesanan layanan laundry secara online serta memudahkan admin dalam mengelola pesanan.
 
 ---
 
