@@ -12,56 +12,55 @@ class PesananController extends Controller
 {
     // Menampilkan halaman dashboard dengan daftar layanan
     public function index()
-        {
-            $layanans = \App\Models\Layanan::all();
+    {
+        $layanan = \App\Models\Layanan::all();
+        
+        // Cek jumlah data yang masuk
+        // return "Jumlah layanan di database: " . $layanan->count(); 
+        
+        $pesanan_saya = \App\Models\Pesanan::where('id_pelanggan', auth('pelanggan')->id())->get();
+        return view('dashboard', compact('layanan', 'pesanan_saya'));
+    }
 
-        if (auth()->user()->role === 'admin') {
-            // Tambahkan 'pembayaran' di dalam with()
-            $semua_pesanan = \App\Models\Pesanan::with(['user', 'pembayaran'])
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-            return view('dashboard', compact('layanans', 'semua_pesanan'));
-        }
+    public function adminIndex()
+    {
+        // 1. Ambil SEMUA pesanan dari database untuk dikelola Admin
+        // Kita pakai eager loading 'pelanggan' biar bisa nampilin nama pemesannya
+        $semua_pesanan = \App\Models\Pesanan::with('pelanggan')->latest()->get();
 
-        return view('dashboard', compact('layanans'));
+        // 2. Ambil data layanan (siapa tahu admin butuh lihat daftar harga)
+        $layanan = \App\Models\Layanan::all();
+
+        // 3. Kirim ke view dashboard (view-nya sama, tapi nanti isinya beda karena guard admin)
+        return view('dashboard', compact('semua_pesanan', 'layanan'));
     }
 
     // Logika menyimpan pesanan (Checkout)
     public function store(Request $request)
     {
-        // 1. Validasi input
+        // 1. Validasi Input
         $request->validate([
             'id_layanan' => 'required|exists:layanans,id_layanan',
-            'berat' => 'required|numeric|min:1',
+            'alamat' => 'required|string|max:255',
         ]);
 
-        // 2. Ambil data layanan untuk hitung harga
-        $layanan = Layanan::find($request->id_layanan);
-        $total_harga = $layanan->harga_per_kg * $request->berat;
-
-        // 3. Simpan ke tabel pesanans
-        $pesanan = Pesanan::create([
-            'id_user' => Auth::id(),
-            'tanggal_pesan' => now(),
-            'status' => 'menunggu',
-            'total_harga' => $total_harga,
+        // 2. Simpan Data
+        \App\Models\Pesanan::create([
+            'id_pelanggan' => auth('pelanggan')->id(),
+            'id_layanan' => $request->id_layanan,
+            'alamat' => $request->alamat, // Pastikan kolom 'alamat' ada di tabel pesanans
+            'status' => 'menunggu_jemput', // Status awal sesuai alur baru kita
+            'total_harga' => 0, // Harga 0 dulu karena belum ditimbang
         ]);
 
-        // 4. Simpan ke tabel detail_pesanans
-        DetailPesanan::create([
-            'id_pesanan' => $pesanan->id_pesanan,
-            'id_layanan' => $layanan->id_layanan,
-            'berat' => $request->berat,
-            'subtotal' => $total_harga,
-        ]);
-
-        return redirect()->back()->with('success', 'Pesanan berhasil dibuat! Total: Rp ' . number_format($total_harga, 0, ',', '.'));
+        return redirect()->route('dashboard')->with('success', 'Pesanan berhasil dibuat! Kurir akan segera menjemput.');
     }
+
     // Fungsi untuk mengubah status pesanan (Khusus Admin)
     public function updateStatus(Request $request, $id)
     {
         // Cek apakah yang akses benar-benar admin
-        if (auth()->user()->role !== 'admin') {
+        if (auth('admin')->check() && auth('admin')->user()->role !== 'admin') {
             return redirect()->back()->with('error', 'Anda tidak punya akses!');
         }
 
@@ -77,5 +76,37 @@ class PesananController extends Controller
         $pesanan->save();
 
         return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui!');
+    }
+
+    public function inputTimbangan(Request $request, $id)
+    {
+        // 1. Validasi inputan berat
+        $request->validate([
+            'berat' => 'required|numeric|min:0.1',
+        ]);
+
+        // 2. Cari data pesanan dan layanan terkait
+        $pesanan = Pesanan::findOrFail($id);
+        $layanan = $pesanan->layanan; // Pastikan relasi 'layanan' sudah ada di Model Pesanan
+
+        // 3. Hitung total harga berdasarkan berat asli
+        $total_harga = $request->berat * $layanan->harga_per_kg;
+
+        // 4. Update data pesanan
+        $pesanan->update([
+            'berat' => $request->berat,
+            'total_harga' => $total_harga,
+            'status' => 'menunggu_pembayaran', // Geser status ke tahap selanjutnya
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Berat pesanan #' . $id . ' berhasil diinput. User sekarang bisa melakukan pembayaran!');
+    }
+
+    public function konfirmasiPembayaran($id)
+    {
+        $pesanan = Pesanan::findOrFail($id);
+        $pesanan->update(['status' => 'dicuci']); // Alur: Bayar -> Cuci
+
+        return redirect()->back()->with('success', 'Pembayaran valid, selamat mencuci!');
     }
 }

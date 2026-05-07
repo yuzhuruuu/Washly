@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id('id_pembayaran');
-            $table->foreignId('id_pesanan')->unique()->constrained('pesanans', 'id_pesanan')->onDelete('cascade');
-            $table->enum('metode_pembayaran', ['cash', 'transfer', 'e-wallet']);
+            $table->foreignId('id_pesanan')->constrained('pesanans', 'id_pesanan');
             $table->date('tanggal_bayar')->nullable();
-            $table->enum('status_pembayaran', ['belum_bayar', 'lunas'])->default('belum_bayar');
-            $table->decimal('jumlah_bayar', 10, 2);
+            $table->enum('status_pembayaran', ["segera lakukan pembayaran", "diterima", "ditolak"])->default('segera lakukan pembayaran');
+            $table->string('bukti_bayar')->nullable();
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

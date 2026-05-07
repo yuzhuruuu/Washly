@@ -3,22 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pembayaran extends Model
 {
-    // Tentukan primary key-nya kalau bukan 'id'
+    use HasFactory;
+
+    protected $table = 'pembayarans';
     protected $primaryKey = 'id_pembayaran';
 
-    // Daftarkan kolom yang boleh diisi melalui form/controller
     protected $fillable = [
-        'id_pesanan',
-        'tanggal_bayar',
-        'jumlah_bayar',
-        'bukti_bayar',
-        'status_pembayaran'
+        'id_pesanan', 'tanggal_bayar', 'status_pembayaran', 'bukti_bayar'
     ];
 
-    // Relasi ke Pesanan
     public function pesanan()
     {
         return $this->belongsTo(Pesanan::class, 'id_pesanan');

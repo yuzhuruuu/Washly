@@ -11,12 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::create('kurirs', function (Blueprint $table) {
             $table->id('id_kurir');
-            $table->string('nama', 100);
-            $table->string('no_telepon', 15);
+            $table->string('nama');
+            $table->string('no_hp');
+            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
+            $table->string('email');
+            $table->string('password');
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

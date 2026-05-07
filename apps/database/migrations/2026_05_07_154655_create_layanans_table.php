@@ -11,12 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('layanans', function (Blueprint $table) {
-        $table->id('id_layanan'); // Primary Key
-        $table->string('nama_layanan', 100);
-        $table->decimal('harga_per_kg', 10, 2);
-        $table->timestamps();
-    });
+        Schema::disableForeignKeyConstraints();
+
+        Schema::create('layanans', function (Blueprint $table) {
+            $table->id('id_layanan');
+            $table->string('nama_layanan');
+            $table->decimal('harga_per_kg');
+            $table->timestamps();
+        });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

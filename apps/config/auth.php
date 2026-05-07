@@ -16,8 +16,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'guard' => 'pelanggan', // Ganti dari 'web' ke 'pelanggan'
+        'passwords' => 'pelanggans',
     ],
 
     /*
@@ -38,9 +38,17 @@ return [
     */
 
     'guards' => [
-        'web' => [
+        'admin' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'admins',
+        ],
+        'pelanggan' => [
+            'driver' => 'session',
+            'provider' => 'pelanggans',
+        ],
+        'kurir' => [
+            'driver' => 'session',
+            'provider' => 'kurirs',
         ],
     ],
 
@@ -62,15 +70,18 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'admins' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', User::class),
+            'model' => App\Models\Admin::class, // Pastikan kamu sudah buat model Admin
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'pelanggans' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pelanggan::class, // Pastikan kamu sudah buat model Pelanggan
+        ],
+        'kurirs' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Kurir::class, // Pastikan kamu sudah buat model Kurir
+        ],
     ],
 
     /*
@@ -92,10 +103,22 @@ return [
     |
     */
 
-    'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+   'passwords' => [
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'pelanggans' => [
+            'provider' => 'pelanggans',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'kurirs' => [
+            'provider' => 'kurirs',
+            'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
