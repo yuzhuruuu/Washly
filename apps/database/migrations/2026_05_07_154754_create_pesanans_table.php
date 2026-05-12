@@ -20,7 +20,7 @@ return new class extends Migration
             $table->dateTime('tanggal_pesan');
             $table->decimal('berat', 8, 2)->nullable();
             $table->integer('total_harga')->default(0);
-            $table->enum('status', ["menunggu_pickup", "menunggu_bayar", "proses", "delivery", "selesai"]);
+            $table->string('status', ["menunggu_pickup", "menunggu_bayar", "proses", "delivery", "selesai"]);
             $table->text('catatan')->nullable();
             $table->dateTime('tanggal_pickup')->nullable();
             $table->dateTime('tanggal_selesai')->nullable();
