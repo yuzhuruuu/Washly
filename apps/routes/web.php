@@ -23,7 +23,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // ==========================================
 Route::middleware(['auth:pelanggan'])->group(function () {
     
-    Route::get('/dashboard', [PesananController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [PesananController::class, 'pelangganIndex'])->name('dashboard');
 
     // Manajemen Pesanan
     Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
@@ -58,22 +58,26 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     // 3. UPDATE STATUS (Alur: Cuci -> Selesai)
     Route::patch('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])
         ->name('pesanan.updateStatus');
+
+    // Rute untuk simpan perubahan berat dan kurir
+    Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
+
+    Route::post('/kurir/store', [App\Http\Controllers\AdminController::class, 'storeKurir'])->name('admin.kurir.store');
+
+    Route::post('/admin/pesanan/manual', [App\Http\Controllers\PesananController::class, 'storeManual'])->name('pesanan.storeManual');
 });
 
 
 // ==========================================
-// AREA KURIR (Fitur Baru Washly!)
+// AREA KURIR
 // ==========================================
 Route::middleware(['auth:kurir'])->prefix('kurir')->group(function () {
-    Route::get('/dashboard', function() {
-        return "Halo Kurir " . auth('kurir')->user()->nama;
-    })->name('kurir.dashboard');
-    
-    // Nanti bisa tambah route jemput/antar barang di sini
-});
+    // Pastikan ini mengarah ke folder kurir.dashboard
+    Route::get('/dashboard', [PesananController::class, 'kurirIndex'])->name('kurir.dashboard');
 
-// Hapus require auth.php kalau kamu tidak pakai Breeze/Jetstream bawaan lagi
-// require __DIR__.'/auth.php';
+    Route::post('/kurir/tugas/{id}/selesaikan', [App\Http\Controllers\PesananController::class, 'kurirSelesaikanTugas'])->name('kurir.tugas.selesai');
+});
 
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/pesanan/upload-bayar/{id}', [App\Http\Controllers\PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');

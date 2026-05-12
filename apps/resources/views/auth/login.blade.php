@@ -22,12 +22,12 @@
 
         {{-- Form Login menembak ke Route POST /login --}}
         <form action="{{ route('login') }}" method="POST">
-            @csrf {{-- <--- INI WAJIB ADA, EGE! --}}
+            @csrf {{-- <--- INI WAJIB ADA --}}
             <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
-                       placeholder="contoh@email.com" required>
+                <label class="block text-gray-700 text-sm font-bold mb-2">Email / Username</label>
+                <input type="text" name="login_identity" value="{{ old('login_identity') }}" 
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500" 
+                    placeholder="Masukkan email atau username" required>
             </div>
             
             <div class="mb-6">

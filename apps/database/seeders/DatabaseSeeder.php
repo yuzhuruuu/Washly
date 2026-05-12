@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
         // 3. Buat Data Kurir
         Kurir::create([
             'nama' => 'Budi Kurir',
-            'email' => 'budi@washly.com',
+            'username' => 'budi_washly',
             'password' => Hash::make('password123'),
             'no_hp' => '08987654321',
             'status' => 'aktif',

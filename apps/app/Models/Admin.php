@@ -23,6 +23,7 @@ class Admin extends Authenticatable
     protected $fillable = [
         'nama',
         'email',
+        'username',
         'password',
     ];
 
@@ -39,5 +40,6 @@ class Admin extends Authenticatable
      */
     protected $casts = [
         'password' => 'hashed',
+        'username' => 'string',
     ];
 }

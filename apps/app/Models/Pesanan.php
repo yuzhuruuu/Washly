@@ -13,13 +13,18 @@ class Pesanan extends Model
     protected $primaryKey = 'id_pesanan';
 
     protected $fillable = [
-        'id_pelanggan', 'id_layanan', 'tanggal_pesan', 'berat', 
-        'total_harga', 'status', 'catatan', 'tanggal_pickup', 'tanggal_selesai'
+        'id_pelanggan', 'id_layanan', 'id_kurir', 'tanggal_pesan', 'berat', 
+        'total_harga', 'bukti_bayar', 'status', 'catatan', 'tanggal_pickup', 'tanggal_selesai'
     ];
 
     public function pelanggan()
     {
         return $this->belongsTo(Pelanggan::class, 'id_pelanggan');
+    }
+
+    public function kurir()
+    {
+        return $this->belongsTo(Kurir::class, 'id_kurir');
     }
 
     public function layanan()

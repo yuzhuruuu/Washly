@@ -14,7 +14,7 @@ class Kurir extends Authenticatable
     protected $primaryKey = 'id_kurir';
 
     protected $fillable = [
-        'nama', 'email', 'password', 'no_hp', 'status',
+        'nama', 'username', 'password', 'no_hp', 'status',
     ];
 
     protected $hidden = [
@@ -35,5 +35,11 @@ class Kurir extends Authenticatable
     public function deliveries()
     {
         return $this->hasMany(Pengiriman::class, 'id_kurir_antar');
+    }
+
+    public function pesanan()
+    {
+        // Pastikan nama foreign key-nya 'id_kurir' sesuai tabel kamu
+        return $this->hasMany(Pesanan::class, 'id_kurir');
     }
 }

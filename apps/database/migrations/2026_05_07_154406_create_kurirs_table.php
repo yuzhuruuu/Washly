@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('no_hp');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
-            $table->string('email');
+            $table->string('username')->unique();
             $table->string('password');
             $table->timestamps();
         });

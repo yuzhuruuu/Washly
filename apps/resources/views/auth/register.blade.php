@@ -31,7 +31,7 @@
                     <input type="text" name="nama" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Contoh: Zayn Malik" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">No. WhatsApp</label>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">No. HP</label>
                     <input type="text" name="no_hp" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="08123..." required>
                 </div>
             </div>
@@ -39,6 +39,11 @@
             <div class="mb-4">
                 <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Email</label>
                 <input type="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="nama@email.com" required>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Username</label>
+                <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Username" required>
             </div>
 
             <div class="mb-4">

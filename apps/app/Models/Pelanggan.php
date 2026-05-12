@@ -23,6 +23,7 @@ class Pelanggan extends Authenticatable
     protected $fillable = [
         'nama',      // Tadi di migrasi kamu 'nama', bukan 'name' kan?
         'email',
+        'username',  // Tambahkan ini
         'password',
         'no_hp',     // Tambahkan ini
         'alamat',    // Tambahkan ini

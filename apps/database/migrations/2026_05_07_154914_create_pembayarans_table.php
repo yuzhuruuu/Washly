@@ -15,11 +15,13 @@ return new class extends Migration
 
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id('id_pembayaran');
-            $table->foreignId('id_pesanan')->constrained('pesanans', 'id_pesanan');
+            $table->unsignedBigInteger('id_pesanan');
             $table->date('tanggal_bayar')->nullable();
-            $table->enum('status_pembayaran', ["segera lakukan pembayaran", "diterima", "ditolak"])->default('segera lakukan pembayaran');
-            $table->string('bukti_bayar')->nullable();
+            $table->string('status_pembayaran')->default('validasi');
+            $table->string('bukti_bayar');
             $table->timestamps();
+
+            $table->foreign('id_pesanan')->references('id_pesanan')->on('pesanans')->onDelete('cascade');
         });
 
         Schema::enableForeignKeyConstraints();
