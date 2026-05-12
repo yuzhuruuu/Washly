@@ -25,20 +25,37 @@ class PesananController extends Controller
             'perlu_diproses' => Pesanan::whereIn('status', ['menunggu_pickup', 'menunggu_timbang'])->count(),
         ];
 
-        // REVISI: Eager Loading 'kurir' dan 'pelanggan' biar gak berat
-        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir'])->latest()->get();
+        // REVISI: Eager Loading 'kurir', 'pelanggan', dan 'pembayaran' biar bukti bayar bisa ditampilkan
+        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->latest()->get();
         $pesanan_terbaru = $semua_pesanan->take(5);
+        $jumlah_pesanan = $semua_pesanan->count();
+        $total_pendapatan_semua = $semua_pesanan->sum('total_harga');
+        $rata_rata_berat = round($semua_pesanan->where('berat', '>', 0)->avg('berat') ?? 0, 2);
 
         // REVISI: Admin butuh liat semua kurir (termasuk yang sibuk) buat ditugaskan
-        $daftar_kurir = Kurir::all(); 
+        $daftar_kurir = Kurir::all();
         $daftar_layanan = Layanan::all();
+        $daftar_pembayaran = \App\Models\Pembayaran::with(['pesanan.pelanggan'])->latest()->get();
+
+        $admin = auth('admin')->user();
+        $toko_profil = [
+            'nama' => 'Washly Laundry',
+            'alamat' => 'Jl. Melati No. 12, Bandung',
+            'jam_operasional' => 'Senin - Sabtu, 08:00 - 20:00',
+        ];
 
         return view('admin.dashboard', compact(
-            'stats', 
-            'semua_pesanan', 
-            'pesanan_terbaru', 
-            'daftar_kurir', 
-            'daftar_layanan'
+            'stats',
+            'semua_pesanan',
+            'pesanan_terbaru',
+            'jumlah_pesanan',
+            'total_pendapatan_semua',
+            'rata_rata_berat',
+            'daftar_kurir',
+            'daftar_layanan',
+            'daftar_pembayaran',
+            'admin',
+            'toko_profil'
         ));
     }
 
@@ -60,8 +77,8 @@ class PesananController extends Controller
         $statusBaru = $request->status;
 
         // 🔥 MAGIC: Kalau admin input berat (>0) dan sebelumnya beratnya 0, status OTOMATIS jadi menunggu_bayar!
-        if ($beratBaru > 0 && $pesanan->berat == 0) {
-            $statusBaru = 'menunggu_bayar';
+        if ($beratBaru > 0 && $pesanan->status == 'menunggu_timbang') {
+                    $statusBaru = 'menunggu_bayar';
         }
 
         $pesanan->update([

@@ -63,6 +63,7 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
 
     Route::post('/kurir/store', [App\Http\Controllers\AdminController::class, 'storeKurir'])->name('admin.kurir.store');
+    Route::patch('/layanan/{id}/update', [App\Http\Controllers\AdminController::class, 'updateLayanan'])->name('admin.layanan.update');
 
     Route::post('/admin/pesanan/manual', [App\Http\Controllers\PesananController::class, 'storeManual'])->name('pesanan.storeManual');
 });

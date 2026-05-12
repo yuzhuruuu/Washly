@@ -19,7 +19,7 @@
                 <button onclick="bukaHalaman('tab-dashboard', this)" class="menu-btn block w-full text-left py-2 px-4 bg-blue-600 rounded transition">
                     Dashboard
                 </button>
-                <button onclick="bukaHalaman('tab-pesanan', this)" class="menu-btn block w-full text-left py-2 px-4 hover:bg-gray-800 rounded transition">
+                <button id="sidebar-tab-pesanan-btn" onclick="bukaHalaman('tab-pesanan', this)" class="menu-btn block w-full text-left py-2 px-4 hover:bg-gray-800 rounded transition">
                     Kelola Pesanan
                 </button>
                 <button onclick="bukaHalaman('tab-pembayaran', this)" class="menu-btn block w-full text-left py-2 px-4 hover:bg-gray-800 rounded transition">
@@ -47,6 +47,11 @@
         {{-- ========================================== --}}
         <div class="flex-1 p-10">
             <h2 id="judul-halaman" class="text-3xl font-bold mb-8 text-gray-800">Dashboard</h2>
+            @if(session('success'))
+                <div class="mb-6 rounded-3xl border border-green-200 bg-green-50 px-5 py-4 text-sm text-green-700">
+                    {{ session('success') }}
+                </div>
+            @endif
 
             {{-- HALAMAN 1: DASHBOARD --}}
             <div id="tab-dashboard" class="tab-konten block">
@@ -70,7 +75,12 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border p-6">
-                    <h3 class="font-bold text-gray-800 mb-4">Pesanan Terbaru</h3>
+                    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-4">
+                        <h3 class="font-bold text-gray-800">Pesanan Terbaru</h3>
+                        <button onclick="bukaHalaman('tab-pesanan', document.getElementById('sidebar-tab-pesanan-btn'))" class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 transition">
+                            Lihat Semua Pesanan
+                        </button>
+                    </div>
                     <table class="w-full text-left">
                         <tbody class="divide-y">
                             @foreach($pesanan_terbaru ?? [] as $pt)
@@ -113,7 +123,7 @@
                     </div>
 
                     {{-- ========================================== --}}
-                    {{-- MODAL DETAIL (VERSI LENGKAP INFO PELANGGAN) --}}
+                    {{-- MODAL DETAIL (REVISI AUTO-STATUS) --}}
                     {{-- ========================================== --}}
                     <div id="modal-{{ $p->id_pesanan }}" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center z-50 p-4">
                         <div class="bg-white rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
@@ -143,16 +153,23 @@
 
                                     <div>
                                         <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Bukti Pembayaran</h4>
-                                        @if($p->bukti_bayar)
-                                            <a href="{{ asset('storage/'.$p->bukti_bayar) }}" target="_blank" class="group relative block rounded-2xl overflow-hidden border-2 border-gray-100">
-                                                <img src="{{ asset('storage/'.$p->bukti_bayar) }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+                                        @php
+                                            $buktiPath = $p->bukti_bayar ?? optional($p->pembayaran)->bukti_bayar;
+                                            $metodePembayaran = $p->metode_pembayaran ?? optional($p->pembayaran)->metode_pembayaran;
+                                        @endphp
+                                        @if($metodePembayaran)
+                                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Metode: {{ $metodePembayaran == 'transfer_bank' ? 'Transfer Bank' : 'E-Walet / QRIS' }}</p>
+                                        @endif
+                                        @if($buktiPath)
+                                            <a href="{{ asset('storage/'.$buktiPath) }}" target="_blank" class="group relative block rounded-2xl overflow-hidden border-2 border-gray-100">
+                                                <img src="{{ asset('storage/'.$buktiPath) }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
                                                 <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                                                     <span class="bg-white text-gray-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg">Klik Perbesar</span>
                                                 </div>
                                             </a>
                                         @else
                                             <div class="py-12 text-center border-2 border-dashed rounded-2xl bg-gray-50 text-gray-400 italic text-sm">
-                                                Belum ada bukti pembayaran ege.
+                                                Belum ada bukti pembayaran!
                                             </div>
                                         @endif
                                     </div>
@@ -167,7 +184,10 @@
                                         <div>
                                             <label class="block text-xs font-bold text-gray-600 mb-2">Update Berat (Kg)</label>
                                             <div class="relative">
-                                                <input type="number" step="0.1" name="berat" value="{{ $p->berat }}" class="w-full bg-gray-50 border-gray-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-400 transition" placeholder="Contoh: 3.5">
+                                                {{-- SULAP: oninput akan mengubah dropdown status secara otomatis --}}
+                                                <input type="number" step="0.1" name="berat" value="{{ $p->berat }}" 
+                                                    oninput="if(this.value > 0 && document.getElementById('status-{{ $p->id_pesanan }}').value == 'menunggu_timbang') { document.getElementById('status-{{ $p->id_pesanan }}').value = 'menunggu_bayar'; }"
+                                                    class="w-full bg-gray-50 border-gray-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-400 transition" placeholder="Contoh: 3.5">
                                                 <span class="absolute right-4 top-3 text-gray-400 font-bold">Kg</span>
                                             </div>
                                             @if($p->total_harga > 0)
@@ -187,7 +207,8 @@
 
                                         <div>
                                             <label class="block text-xs font-bold text-gray-600 mb-2">Status Pesanan</label>
-                                            <select name="status" class="w-full bg-blue-50 text-blue-700 border-blue-100 rounded-xl py-3 px-4 font-bold focus:ring-2 focus:ring-blue-400">
+                                            {{-- Dikasih ID status-{{ $p->id_pesanan }} supaya bisa dipanggil JavaScript di atas --}}
+                                            <select name="status" id="status-{{ $p->id_pesanan }}" class="w-full bg-blue-50 text-blue-700 border-blue-100 rounded-xl py-3 px-4 font-bold focus:ring-2 focus:ring-blue-400">
                                                 <option value="menunggu_pickup" {{ $p->status == 'menunggu_pickup' ? 'selected' : '' }}>Jemput Sekarang</option>
                                                 <option value="menunggu_timbang" {{ $p->status == 'menunggu_timbang' ? 'selected' : '' }}>Sudah Dijemput (Tunggu Timbang)</option>
                                                 <option value="menunggu_bayar" {{ $p->status == 'menunggu_bayar' ? 'selected' : '' }}>Menunggu Pembayaran User</option>
@@ -210,7 +231,7 @@
                 </div>
             </div>
 
-            {{-- HALAMAN 3: KURIR (UDAH BALIK JIR!) --}}
+            {{-- HALAMAN 3: KURIR --}}
             <div id="tab-kurir" class="tab-konten hidden">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-6">
@@ -261,7 +282,7 @@
                                     </td>
                                 </tr>
                                 @empty
-                                <tr><td colspan="5" class="p-10 text-center text-gray-400 italic">Belum ada kurir ege, rekrut si Budi gih!</td></tr>
+                                <tr><td colspan="5" class="p-10 text-center text-gray-400 italic">Belum ada kurir, rekrut si Budi gih!</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -270,8 +291,209 @@
             </div>
 
             {{-- HALAMAN LAIN (KOSONGAN) --}}
-            <div id="tab-pembayaran" class="tab-konten hidden"><div class="p-20 text-center text-gray-400 italic">Gunakan halaman Kelola Pesanan untuk validasi bayar ege.</div></div>
-            <div id="tab-kurir" class="tab-konten hidden"><div class="p-20 text-center text-gray-400 italic">Data Kurir.</div></div>
+            <div id="tab-pembayaran" class="tab-konten hidden">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">Validasi Pembayaran</h3>
+                            <p class="text-sm text-gray-500 mt-2">Lihat status bukti pembayaran pelanggan dan konfirmasi jika sudah sesuai.</p>
+                        </div>
+                        <button onclick="bukaHalaman('tab-pesanan', document.getElementById('sidebar-tab-pesanan-btn'))" class="rounded-xl bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition">Buka Kelola Pesanan</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 border-b text-xs uppercase text-gray-400">
+                                <tr>
+                                    <th class="p-4 font-bold">Pesanan</th>
+                                    <th class="p-4 font-bold">Nama Pelanggan</th>
+                                    <th class="p-4 font-bold">Metode</th>
+                                    <th class="p-4 font-bold">Status</th>
+                                    <th class="p-4 font-bold">Bukti</th>
+                                    <th class="p-4 font-bold">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @forelse($daftar_pembayaran ?? [] as $pembayaran)
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="p-4 text-sm font-bold">WS-{{ $pembayaran->id_pesanan }}</td>
+                                    <td class="p-4 text-sm text-gray-600">{{ optional(optional($pembayaran->pesanan)->pelanggan)->nama ?? '-' }}</td>
+                                    <td class="p-4 text-sm text-gray-600">{{ $pembayaran->metode_pembayaran == 'transfer_bank' ? 'Transfer Bank' : 'E-Walet / QRIS' }}</td>
+                                    <td class="p-4 text-sm">
+                                        @if($pembayaran->status_pembayaran == 'valid')
+                                            <span class="px-2 py-1 rounded-full bg-green-100 text-green-700 uppercase text-[10px] font-bold">Valid</span>
+                                        @else
+                                            <span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 uppercase text-[10px] font-bold">Menunggu Validasi</span>
+                                        @endif
+                                    </td>
+                                    <td class="p-4 text-sm text-blue-600 font-semibold">
+                                        @if($pembayaran->bukti_bayar)
+                                            <a href="{{ asset('storage/'.$pembayaran->bukti_bayar) }}" target="_blank" class="hover:underline">Lihat Bukti</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        @if($pembayaran->status_pembayaran !== 'valid')
+                                            <form action="{{ route('pembayaran.konfirmasi', $pembayaran->id_pembayaran) }}" method="POST" class="inline-block">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="rounded-xl bg-green-600 text-white px-3 py-2 text-xs font-bold hover:bg-green-700 transition">Konfirmasi</button>
+                                            </form>
+                                        @else
+                                            <span class="text-xs text-gray-500">Tidak ada aksi</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="6" class="p-10 text-center text-gray-400 italic">Belum ada bukti pembayaran yang masuk.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="tab-riwayat-admin" class="tab-konten hidden">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Riwayat Pesanan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="rounded-3xl border border-gray-200 bg-sky-50 p-6">
+                            <p class="text-sm uppercase tracking-[0.3em] text-sky-600 font-semibold">Total Pesanan</p>
+                            <p class="mt-4 text-3xl font-bold text-slate-900">{{ $jumlah_pesanan ?? 0 }}</p>
+                        </div>
+                        <div class="rounded-3xl border border-gray-200 bg-emerald-50 p-6">
+                            <p class="text-sm uppercase tracking-[0.3em] text-emerald-600 font-semibold">Total Pendapatan</p>
+                            <p class="mt-4 text-3xl font-bold text-emerald-900">Rp {{ number_format($total_pendapatan_semua ?? 0, 0, ',', '.') }}</p>
+                        </div>
+                        <div class="rounded-3xl border border-gray-200 bg-violet-50 p-6">
+                            <p class="text-sm uppercase tracking-[0.3em] text-violet-600 font-semibold">Rata-rata Berat</p>
+                            <p class="mt-4 text-3xl font-bold text-violet-900">{{ number_format($rata_rata_berat ?? 0, 2, ',', '.') }} kg</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500 tracking-wide">
+                                <tr>
+                                    <th class="px-4 py-3">No</th>
+                                    <th class="px-4 py-3">Pelanggan</th>
+                                    <th class="px-4 py-3">Layanan</th>
+                                    <th class="px-4 py-3">Berat</th>
+                                    <th class="px-4 py-3">Total Harga</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Tanggal</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 bg-white">
+                                @forelse($semua_pesanan as $index => $pesanan)
+                                    <tr>
+                                        <td class="px-4 py-4 text-gray-700">{{ $index + 1 }}</td>
+                                        <td class="px-4 py-4 text-gray-700">{{ $pesanan->pelanggan->nama ?? 'Tidak diketahui' }}</td>
+                                        <td class="px-4 py-4 text-gray-700">{{ $pesanan->layanan->nama_layanan ?? '-' }}</td>
+                                        <td class="px-4 py-4 text-gray-700">{{ $pesanan->berat > 0 ? number_format($pesanan->berat, 2, ',', '.') . ' kg' : '0 kg' }}</td>
+                                        <td class="px-4 py-4 text-gray-700">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</td>
+                                        <td class="px-4 py-4">
+                                            <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                                                {{ ucfirst(str_replace('_', ' ', $pesanan->status ?? 'unknown')) }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-4 text-gray-500">{{ optional($pesanan->created_at)->format('d M Y') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="px-4 py-10 text-center text-gray-400">Belum ada riwayat pesanan.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="tab-pengaturan" class="tab-konten hidden">
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Pengaturan Admin</h3>
+                    <div class="grid gap-6 lg:grid-cols-2">
+                        <div class="rounded-3xl border border-gray-200 bg-slate-50 p-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Informasi Admin</h4>
+                            <p class="text-sm text-gray-500 mb-4">Data admin saat ini yang sedang login.</p>
+                            <div class="space-y-4 text-sm text-gray-700">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Nama</p>
+                                    <p>{{ $admin->nama ?? 'Admin Washly' }}</p>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Username</p>
+                                    <p>{{ $admin->username ?? '-' }}</p>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Email</p>
+                                    <p>{{ $admin->email ?? '-' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-3xl border border-gray-200 bg-slate-50 p-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-3">Profil Toko</h4>
+                            <p class="text-sm text-gray-500 mb-4">Informasi dasar toko laundry yang bisa dilihat admin.</p>
+                            <div class="space-y-4 text-sm text-gray-700">
+                                <div>
+                                    <p class="font-semibold text-gray-800">Nama Laundry</p>
+                                    <p>{{ $toko_profil['nama'] }}</p>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Alamat</p>
+                                    <p>{{ $toko_profil['alamat'] }}</p>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">Jam Operasional</p>
+                                    <p>{{ $toko_profil['jam_operasional'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Edit Layanan & Tarif</h4>
+                        <div class="overflow-x-auto rounded-3xl border border-gray-200 bg-white shadow-sm">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500 tracking-wide">
+                                    <tr>
+                                        <th class="px-4 py-3">Layanan</th>
+                                        <th class="px-4 py-3">Harga / Kg</th>
+                                        <th class="px-4 py-3">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    @forelse($daftar_layanan as $layanan)
+                                        <tr>
+                                            <td class="px-4 py-4 text-gray-700">
+                                                <form action="{{ route('admin.layanan.update', $layanan->id_layanan) }}" method="POST" class="grid gap-3 sm:grid-cols-[1fr,200px,130px] items-center">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="text" name="nama_layanan" value="{{ $layanan->nama_layanan }}" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800" required>
+                                            </td>
+                                            <td class="px-4 py-4 text-gray-700">
+                                                    <div class="relative">
+                                                        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">Rp</span>
+                                                        <input type="number" name="harga_per_kg" value="{{ $layanan->harga_per_kg }}" step="0.01" min="0" class="w-full rounded-xl border border-gray-200 bg-gray-50 px-11 py-3 text-sm text-gray-800" required>
+                                                    </div>
+                                            </td>
+                                            <td class="px-4 py-4 text-gray-700">
+                                                    <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition hover:bg-blue-700 sm:w-full">
+                                                        Simpan
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="px-4 py-10 text-center text-gray-400">Belum ada layanan tersedia untuk diedit.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div> 
     </div>

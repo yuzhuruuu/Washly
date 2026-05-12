@@ -46,4 +46,21 @@ class AdminController extends Controller
 
         return back()->with('success', 'Akun Kurir berhasil dibuat! Budi siap disuruh kerja.');
     }
+
+    public function updateLayanan(Request $request, $id)
+    {
+        $layanan = \App\Models\Layanan::findOrFail($id);
+
+        $request->validate([
+            'nama_layanan' => 'required|string|max:255',
+            'harga_per_kg' => 'required|numeric|min:0',
+        ]);
+
+        $layanan->update([
+            'nama_layanan' => $request->nama_layanan,
+            'harga_per_kg' => $request->harga_per_kg,
+        ]);
+
+        return back()->with('success', 'Layanan dan tarif berhasil diperbarui.');
+    }
 }

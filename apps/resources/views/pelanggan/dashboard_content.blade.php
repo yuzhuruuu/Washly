@@ -91,7 +91,34 @@
                             <form action="{{ route('pembayaran.store') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                                 @csrf
                                 <input type="hidden" name="id_pesanan" value="{{ $ps->id_pesanan }}">
-                                
+
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-600 uppercase mb-2">Metode Pembayaran</label>
+                                    <select name="metode_pembayaran" onchange="togglePaymentInfo(this, '{{ $ps->id_pesanan }}')" class="w-full border border-yellow-300 rounded-xl py-3 px-4 text-sm focus:ring-yellow-400 focus:border-yellow-400" required>
+                                        <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
+                                        <option value="transfer_bank">Transfer Bank</option>
+                                        <option value="ewalet_qris">E-Walet / QRIS</option>
+                                    </select>
+                                </div>
+
+                                <div id="payment-info-{{ $ps->id_pesanan }}" class="space-y-3 hidden">
+                                    <div id="bank-info-{{ $ps->id_pesanan }}" class="hidden rounded-2xl bg-white border border-yellow-200 p-4 text-sm text-gray-700">
+                                        <p class="font-bold text-yellow-700 mb-2">Transfer Bank</p>
+                                        <p class="text-xs text-gray-500 mb-1">Silakan transfer ke rekening berikut:</p>
+                                        <p class="font-black">BCA 123-456-7890</p>
+                                        <p class="text-xs text-gray-500">a.n. Washly Laundry</p>
+                                    </div>
+                                    <div id="ewalet-info-{{ $ps->id_pesanan }}" class="hidden rounded-2xl bg-white border border-yellow-200 p-4 text-sm text-gray-700">
+                                        <p class="font-bold text-yellow-700 mb-2">E-Walet / QRIS</p>
+                                        <p class="text-xs text-gray-500 mb-3">Scan QR berikut atau gunakan kode berikut di aplikasi e-wallet kamu:</p>
+                                        <div class="bg-gray-100 rounded-2xl p-4 text-center">
+                                            <p class="font-black mb-2">QRIS CODE</p>
+                                            <div class="mx-auto mb-2 w-28 h-28 rounded-xl bg-gray-200 flex items-center justify-center text-xs text-gray-500">QRIS</div>
+                                            <p class="text-xs text-gray-600">0812-3456-7890</p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="relative">
                                     <input type="file" name="bukti_bayar" id="file-{{ $ps->id_pesanan }}" class="hidden" required onchange="updateFileName(this, 'name-{{ $ps->id_pesanan }}')">
                                     <label for="file-{{ $ps->id_pesanan }}" class="flex items-center justify-center w-full px-4 py-2 border-2 border-dashed border-yellow-300 rounded-xl text-xs text-yellow-600 cursor-pointer hover:bg-yellow-100 transition">
@@ -123,3 +150,30 @@
         @endforelse
     </div>
 </div>
+
+<script>
+    function togglePaymentInfo(select, id) {
+        var bankInfo = document.getElementById('bank-info-' + id);
+        var ewalletInfo = document.getElementById('ewalet-info-' + id);
+        var container = document.getElementById('payment-info-' + id);
+        bankInfo.classList.add('hidden');
+        ewalletInfo.classList.add('hidden');
+        if (select.value === 'transfer_bank') {
+            container.classList.remove('hidden');
+            bankInfo.classList.remove('hidden');
+        } else if (select.value === 'ewalet_qris') {
+            container.classList.remove('hidden');
+            ewalletInfo.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+    function updateFileName(input, labelId) {
+        var label = document.getElementById(labelId);
+        if (input.files && input.files[0]) {
+            label.textContent = input.files[0].name;
+        } else {
+            label.textContent = 'Pilih Foto Bukti Transfer';
+        }
+    }
+</script>
