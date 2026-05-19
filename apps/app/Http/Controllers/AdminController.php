@@ -21,9 +21,9 @@ class AdminController extends Controller
         ];
 
         $semua_pesanan = \App\Models\Pesanan::with(['pelanggan', 'layanan'])->latest()->get();
-        $pesanan_terbaru = $semua_pesanan->take(5); // Ambil 5 saja buat summary
+        $pesanan_terbaru = $semua_pesanan->take(5); 
         $daftar_kurir = \App\Models\Kurir::all();
-        $daftar_layanan = \App\Models\Layanan::all(); // Buat modal tambah manual
+        $daftar_layanan = \App\Models\Layanan::all(); 
 
         return view('admin.dashboard', compact('stats', 'semua_pesanan', 'pesanan_terbaru', 'daftar_kurir', 'daftar_layanan'));
     }

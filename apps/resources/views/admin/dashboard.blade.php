@@ -138,49 +138,58 @@
                             </div>
 
                             {{-- Body --}}
-                            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
-                                
-                                {{-- KOLOM KIRI: INFO PELANGGAN & BUKTI --}}
-                                <div class="space-y-6">
-                                    <div>
-                                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Informasi Pelanggan</h4>
-                                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100">
-                                            <p class="text-lg font-bold text-gray-800">{{ $p->pelanggan->nama }}</p>
-                                            <p class="text-sm text-gray-600 mt-1"><i class="fab fa-whatsapp mr-2 text-green-500"></i> {{ $p->pelanggan->no_hp }}</p>
-                                            <p class="text-sm text-gray-600 mt-2 flex items-start"><i class="fas fa-map-marker-alt mr-2 mt-1 text-red-400"></i> {{ $p->pelanggan->alamat }}</p>
+                            <form id="admin-update-form-{{ $p->id_pesanan }}" action="{{ route('admin.pesanan.update', $p->id_pesanan) }}" method="POST" class="space-y-5">
+                                @csrf @method('PATCH')
+                                <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    
+                                    {{-- KOLOM KIRI: INFO PELANGGAN & BUKTI --}}
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Informasi Pelanggan</h4>
+                                            <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                                                <p class="text-lg font-bold text-gray-800">{{ $p->pelanggan->nama }}</p>
+                                                <p class="text-sm text-gray-600 mt-1"><i class="fab fa-whatsapp mr-2 text-green-500"></i> {{ $p->pelanggan->no_hp }}</p>
+                                                <p class="text-sm text-gray-600 mt-2 flex items-start"><i class="fas fa-map-marker-alt mr-2 mt-1 text-red-400"></i> {{ $p->pelanggan->alamat }}</p>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Bukti Pembayaran</h4>
+                                            @if($p->status == 'menunggu_konfirmasi')
+                                                <div class="mb-5 flex items-center justify-between p-4 rounded-2xl border border-blue-100 bg-blue-50">
+                                                    <label for="validasi-pembayaran-{{ $p->id_pesanan }}" class="flex items-center gap-3 cursor-pointer">
+                                                        <input id="validasi-pembayaran-{{ $p->id_pesanan }}" type="checkbox" name="validasi_pembayaran" value="1" class="h-5 w-5 text-blue-600 border-gray-300 rounded">
+                                                        <span class="text-sm font-bold text-blue-700">Centang untuk validasi pembayaran</span>
+                                                    </label>
+                                                    <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Auto ke Sedang Dicuci</span>
+                                                </div>
+                                            @endif
+                                            @php
+                                                $buktiPath = $p->bukti_bayar ?? optional($p->pembayaran)->bukti_bayar;
+                                                $metodePembayaran = $p->metode_pembayaran ?? optional($p->pembayaran)->metode_pembayaran;
+                                            @endphp
+                                            @if($metodePembayaran)
+                                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Metode: {{ $metodePembayaran == 'transfer_bank' ? 'Transfer Bank' : 'E-Walet / QRIS' }}</p>
+                                            @endif
+                                            @if($buktiPath)
+                                                <a href="{{ asset('storage/'.$buktiPath) }}" target="_blank" class="group relative block rounded-2xl overflow-hidden border-2 border-gray-100">
+                                                    <img src="{{ asset('storage/'.$buktiPath) }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+                                                    <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                                                        <span class="bg-white text-gray-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg">Klik Perbesar</span>
+                                                    </div>
+                                                </a>
+                                            @else
+                                                <div class="py-12 text-center border-2 border-dashed rounded-2xl bg-gray-50 text-gray-400 italic text-sm">
+                                                    Belum ada bukti pembayaran!
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Bukti Pembayaran</h4>
-                                        @php
-                                            $buktiPath = $p->bukti_bayar ?? optional($p->pembayaran)->bukti_bayar;
-                                            $metodePembayaran = $p->metode_pembayaran ?? optional($p->pembayaran)->metode_pembayaran;
-                                        @endphp
-                                        @if($metodePembayaran)
-                                            <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Metode: {{ $metodePembayaran == 'transfer_bank' ? 'Transfer Bank' : 'E-Walet / QRIS' }}</p>
-                                        @endif
-                                        @if($buktiPath)
-                                            <a href="{{ asset('storage/'.$buktiPath) }}" target="_blank" class="group relative block rounded-2xl overflow-hidden border-2 border-gray-100">
-                                                <img src="{{ asset('storage/'.$buktiPath) }}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
-                                                <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                                                    <span class="bg-white text-gray-900 px-4 py-2 rounded-full font-bold text-xs shadow-lg">Klik Perbesar</span>
-                                                </div>
-                                            </a>
-                                        @else
-                                            <div class="py-12 text-center border-2 border-dashed rounded-2xl bg-gray-50 text-gray-400 italic text-sm">
-                                                Belum ada bukti pembayaran!
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
+                                    {{-- KOLOM KANAN: FORM UPDATE ADMIN --}}
+                                    <div class="bg-white">
+                                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Aksi Admin</h4>
 
-                                {{-- KOLOM KANAN: FORM UPDATE ADMIN --}}
-                                <div class="bg-white">
-                                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Aksi Admin</h4>
-                                    <form action="{{ route('admin.pesanan.update', $p->id_pesanan) }}" method="POST" class="space-y-5">
-                                        @csrf @method('PATCH')
-                                        
                                         <div>
                                             <label class="block text-xs font-bold text-gray-600 mb-2">Update Berat (Kg)</label>
                                             <div class="relative">
@@ -209,10 +218,12 @@
                                             <label class="block text-xs font-bold text-gray-600 mb-2">Status Pesanan</label>
                                             {{-- Dikasih ID status-{{ $p->id_pesanan }} supaya bisa dipanggil JavaScript di atas --}}
                                             <select name="status" id="status-{{ $p->id_pesanan }}" class="w-full bg-blue-50 text-blue-700 border-blue-100 rounded-xl py-3 px-4 font-bold focus:ring-2 focus:ring-blue-400">
+                                                @if($p->status == 'menunggu_konfirmasi')
+                                                    <option value="menunggu_konfirmasi" selected>Validasi Pembayaran (gunakan checkbox kiri)</option>
+                                                @endif
                                                 <option value="menunggu_pickup" {{ $p->status == 'menunggu_pickup' ? 'selected' : '' }}>Jemput Sekarang</option>
                                                 <option value="menunggu_timbang" {{ $p->status == 'menunggu_timbang' ? 'selected' : '' }}>Sudah Dijemput (Tunggu Timbang)</option>
-                                                <option value="menunggu_bayar" {{ $p->status == 'menunggu_bayar' ? 'selected' : '' }}>Menunggu Pembayaran User</option>
-                                                <option value="menunggu_konfirmasi" {{ $p->status == 'menunggu_konfirmasi' ? 'selected' : '' }}>Validasi Pembayaran User</option>
+                                                <option value="menunggu_bayar" {{ $p->status == 'menunggu_bayar' ? 'selected' : '' }}>Menunggu Pembayaran</option>
                                                 <option value="proses" {{ $p->status == 'proses' ? 'selected' : '' }}>Sedang Dicuci</option>
                                                 <option value="delivery" {{ $p->status == 'delivery' ? 'selected' : '' }}>Siap Diantar Kurir</option>
                                                 <option value="selesai" {{ $p->status == 'selesai' ? 'selected' : '' }}>Selesai / Berhasil</option>
@@ -222,9 +233,9 @@
                                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transition duration-200 uppercase tracking-widest text-xs">
                                             Simpan Perubahan
                                         </button>
-                                    </form>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                     @endforeach

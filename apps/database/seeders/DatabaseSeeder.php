@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
         // 2. Buat Data Pelanggan
         Pelanggan::create([
             'nama' => 'Zayn Malik',
+            'username' => 'zayn_washly',
             'email' => 'javvad@gmail.com',
             'password' => Hash::make('password123'),
             'no_hp' => '081234567890',

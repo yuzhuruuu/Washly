@@ -18,7 +18,7 @@ class AuthController extends Controller
     {
        $request->validate([
             'nama' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:pelanggans', // <--- TAMBAHIN INI
+            'username' => 'required|string|max:255|unique:pelanggans',
             'email' => 'required|string|email|max:255|unique:pelanggans',
             'password' => 'required|string|min:8|confirmed',
             'no_hp' => 'required|string|max:15',
@@ -28,9 +28,9 @@ class AuthController extends Controller
         // Simpan ke tabel pelanggans
         $pelanggan = Pelanggan::create([
             'nama' => $request->nama,
-            'username' => $request->username, // <--- TAMBAHIN INI JUGA
+            'username' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Jangan lupa import Hash ya kalau belum
+            'password' => Hash::make($request->password),
             'no_hp' => $request->no_hp,
             'alamat' => $request->alamat,
         ]);

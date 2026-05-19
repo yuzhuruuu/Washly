@@ -21,24 +21,47 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(Request $request)
+    public function editKurirProfile(Request $request): View
     {
+        return view('kurir.profile', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    public function updateKurirProfile(Request $request)
+    {
+        $user = Auth::guard('kurir')->user();
+
         $request->validate([
             'nama' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'], // Tambahkan unique check kalau perlu
             'no_hp' => ['required', 'string', 'max:15'],
-            'alamat' => ['required', 'string'],
         ]);
 
-        $user = $request->user(); // Ini otomatis mengambil user dari guard yang sedang aktif
-        $user->fill($request->all());
+        $user->update($request->only(['nama', 'no_hp']));
 
-        $user->save();
+        return Redirect::route('kurir.profile.edit')->with('status', 'profile-updated');
+    }
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    public function editKurirSettings(Request $request): View
+    {
+        return view('kurir.settings', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    public function updateKurirSettings(Request $request)
+    {
+        $user = Auth::guard('kurir')->user();
+
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', 'unique:kurirs,username,' . $user->id_kurir . ',id_kurir'],
+            'notify_new_task' => ['nullable', 'boolean'],
+            'no_hp' => ['nullable', 'string', 'max:15'],
+        ]);
+
+        $user->update($request->only(['username', 'notify_new_task', 'no_hp']));
+
+        return Redirect::route('kurir.settings.edit')->with('status', 'profile-updated');
     }
 
     /**

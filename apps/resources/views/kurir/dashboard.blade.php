@@ -69,7 +69,7 @@
         </div>
         @empty
         <div class="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center">
-            <p class="text-gray-400 text-sm italic">Belum ada tugas buat kamu, ege.</p>
+            <p class="text-gray-400 text-sm italic">Belum ada tugas buat kamu!</p>
         </div>
         @endforelse
     </div>
@@ -79,13 +79,17 @@
             <i class="fas fa-home text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">TUGAS</span>
         </a>
-        <a href="#" class="flex flex-col items-center text-gray-400">
+        <a href="{{ route('kurir.history') }}" class="flex flex-col items-center text-gray-400">
             <i class="fas fa-history text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">RIWAYAT</span>
         </a>
-        <a href="{{ route('profile.edit') }}" class="flex flex-col items-center text-gray-400">
-            <i class="fas fa-user-circle text-xl"></i>
+        <a href="{{ route('kurir.profile.edit') }}" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-id-badge text-xl"></i>
             <span class="text-[10px] mt-1 font-bold">PROFIL</span>
+        </a>
+        <a href="{{ route('kurir.settings.edit') }}" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-cog text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">PENGATURAN</span>
         </a>
         <form action="{{ route('logout') }}" method="POST" class="inline">
             @csrf

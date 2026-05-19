@@ -75,6 +75,12 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
 Route::middleware(['auth:kurir'])->prefix('kurir')->group(function () {
     // Pastikan ini mengarah ke folder kurir.dashboard
     Route::get('/dashboard', [PesananController::class, 'kurirIndex'])->name('kurir.dashboard');
+    Route::get('/history', [PesananController::class, 'kurirHistory'])->name('kurir.history');
+    Route::get('/profile', [ProfileController::class, 'editKurirProfile'])->name('kurir.profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'updateKurirProfile'])->name('kurir.profile.update');
+    Route::get('/settings', [ProfileController::class, 'editKurirSettings'])->name('kurir.settings.edit');
+    Route::patch('/settings', [ProfileController::class, 'updateKurirSettings'])->name('kurir.settings.update');
+    Route::put('/settings/password', [App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('kurir.settings.password.update');
 
     Route::post('/kurir/tugas/{id}/selesaikan', [App\Http\Controllers\PesananController::class, 'kurirSelesaikanTugas'])->name('kurir.tugas.selesai');
 });

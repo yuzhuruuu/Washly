@@ -1,10 +1,56 @@
 {{-- Bagian Atas: Welcoming & Info Singkat --}}
-<div class="mb-8 flex justify-between items-end">
-    <div>
-        <h3 class="text-xl font-bold text-gray-800">Halo, {{ Auth::guard('pelanggan')->user()->nama }}! 👋</h3>
-        <p class="text-sm text-gray-500 mt-1">Mau laundry apa hari ini? Kurir kami siap menjemput.</p>
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+            <h3 class="text-xl font-bold text-gray-800">Halo, {{ Auth::guard('pelanggan')->user()->nama }}!</h3>
+            <p class="text-sm text-gray-500 mt-1">Kelola pesananmu di sini. Pilih layanan, cek status, dan lihat riwayat.</p>
+        </div>
+        <div class="flex gap-2 overflow-x-auto">
+            <button onclick="bukaHalaman('tab-beranda', this)" class="tab-btn bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-semibold">Beranda</button>
+            <button onclick="bukaHalaman('tab-layanan', this)" class="tab-btn bg-gray-100 text-gray-700 rounded-xl px-4 py-2 text-sm font-semibold">Layanan</button>
+            <button onclick="bukaHalaman('tab-riwayat', this)" class="tab-btn bg-gray-100 text-gray-700 rounded-xl px-4 py-2 text-sm font-semibold">Riwayat</button>
+            <button onclick="bukaHalaman('tab-tentang', this)" class="tab-btn bg-gray-100 text-gray-700 rounded-xl px-4 py-2 text-sm font-semibold">Tentang Kami</button>
+        </div>
     </div>
 </div>
+
+<div id="tab-beranda" class="tab-content block">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Pesanan Aktif</p>
+            <p class="mt-4 text-3xl font-black text-gray-900">{{ $pesanan_saya->whereIn('status', ['menunggu_pickup', 'menunggu_timbang', 'menunggu_bayar', 'menunggu_konfirmasi', 'proses', 'delivery'])->count() }}</p>
+            <p class="mt-2 text-sm text-gray-500">Sedang diproses oleh Washly.</p>
+        </div>
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Total Pesanan</p>
+            <p class="mt-4 text-3xl font-black text-gray-900">{{ $pesanan_saya->count() }}</p>
+            <p class="mt-2 text-sm text-gray-500">Semua pesanan yang pernah kamu buat.</p>
+        </div>
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Tagihan Tertunda</p>
+            <p class="mt-4 text-3xl font-black text-gray-900">{{ $pesanan_saya->where('status', 'menunggu_bayar')->count() }}</p>
+            <p class="mt-2 text-sm text-gray-500">Unggah bukti pembayaran segera.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+            <h4 class="text-lg font-bold text-gray-800 mb-3">Selamat datang di Washly</h4>
+            <p class="text-sm text-gray-500 leading-relaxed">Di tab Layanan kamu bisa langsung memesan laundry dan melihat status pesanan secara real-time. Tab Riwayat menyimpan semua riwayat pesananmu, sementara Tentang Kami menjelaskan layanan Washly dan keunggulannya.</p>
+        </div>
+        <div class="bg-blue-600 rounded-3xl p-6 shadow-lg text-white">
+            <h4 class="text-lg font-bold mb-3">Cepat & Mudah</h4>
+            <p class="text-sm leading-relaxed">Pesan laundry dengan beberapa klik, bayar lewat transfer atau e-wallet, lalu biarkan kami menjemput dan mengembalikan pakaianmu dalam kondisi bersih.</p>
+            <div class="mt-6 space-y-3 text-sm">
+                <p><span class="font-bold">1.</span> Pilih layanan di tab Layanan.</p>
+                <p><span class="font-bold">2.</span> Unggah bukti pembayaran jika diperlukan.</p>
+                <p><span class="font-bold">3.</span> Pantau status pesanan sampai selesai.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tab-layanan" class="tab-content hidden">
 
 {{-- Card Buat Pesanan Baru --}}
 <div class="bg-blue-600 rounded-2xl p-6 mb-10 shadow-lg text-white">
@@ -145,13 +191,112 @@
             </div>
         @empty
             <div class="col-span-full py-12 text-center bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                <p class="text-gray-400 italic">Belum ada pesanan ege. Cobain dong jasanya!</p>
+                <p class="text-gray-400 italic">Belum ada pesanan. Cobain dong jasanya!</p>
             </div>
         @endforelse
     </div>
 </div>
 
+</div>
+
+<div id="tab-riwayat" class="tab-content hidden">
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <div>
+                <h4 class="text-xl font-bold text-gray-800">Riwayat Pesanan</h4>
+                <p class="text-sm text-gray-500 mt-1">Semua pesananmu ditampilkan di sini.</p>
+            </div>
+            <span class="text-xs uppercase font-bold tracking-widest text-gray-500">Total: {{ $pesanan_saya->count() }}</span>
+        </div>
+
+        @if($pesanan_saya->isEmpty())
+            <div class="rounded-3xl border border-dashed border-gray-200 p-10 text-center text-gray-400">
+                Belum ada riwayat pesanan.
+            </div>
+        @else
+            <div class="space-y-4">
+                @foreach($pesanan_saya as $ps)
+                    <div class="rounded-3xl border p-5 shadow-sm transition hover:shadow-md">
+                        <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                            <div>
+                                <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">#{{ $ps->id_pesanan }}</p>
+                                <h5 class="text-lg font-bold text-gray-900">{{ $ps->layanan->nama_layanan }}</h5>
+                                <p class="text-sm text-gray-500 mt-1">{{ $ps->created_at->format('d M Y H:i') }}</p>
+                            </div>
+                            <div class="space-y-1 text-right">
+                                <p class="text-xs uppercase tracking-widest text-gray-400 font-bold">Status</p>
+                                <p class="text-sm font-bold @if($ps->status == 'selesai') text-green-700 @else text-blue-700 @endif">{{ str_replace('_', ' ', $ps->status) }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
+                            <div>
+                                <p class="font-semibold text-gray-800">Total</p>
+                                <p>{{ $ps->total_harga > 0 ? 'Rp '.number_format($ps->total_harga, 0, ',', '.') : 'Tunggu Ditimbang' }}</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">Alamat</p>
+                                <p>{{ $ps->alamat ?? Auth::guard('pelanggan')->user()->alamat }}</p>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">Kurir</p>
+                                <p>{{ optional($ps->kurir)->nama ?? '-' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
+</div>
+
+<div id="tab-tentang" class="tab-content hidden">
+    <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+        <h4 class="text-xl font-bold text-gray-800 mb-4">Tentang Washly</h4>
+        <p class="text-sm text-gray-500 leading-relaxed mb-4">Washly adalah layanan laundry jemput-antar yang memudahkan pelanggan dalam mencuci, menyetrika, dan mengembalikan pakaian dengan cepat dan aman. Kami melayani berbagai jenis pakaian dan paket layanan untuk kebutuhan sehari-hari.</p>
+        <div class="grid gap-4 md:grid-cols-2">
+            <div class="rounded-3xl bg-blue-50 p-5">
+                <h5 class="font-bold text-gray-900 mb-2">Kenapa pilih Washly?</h5>
+                <ul class="space-y-2 text-sm text-gray-600">
+                    <li>- Penjemputan dan pengantaran langsung ke lokasi kamu.</li>
+                    <li>- Proses cepat dan transparan.</li>
+                    <li>- Harga terjangkau dengan kualitas premium.</li>
+                </ul>
+            </div>
+            <div class="rounded-3xl bg-gray-50 p-5">
+                <h5 class="font-bold text-gray-900 mb-2">Kontak Kami</h5>
+                <p class="text-sm text-gray-600">Jl. Melati No. 12, Bandung</p>
+                <p class="text-sm text-gray-600 mt-2">Telepon: 0812-3456-7890</p>
+                <p class="text-sm text-gray-600">Email: info@washly.laundry</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function bukaHalaman(idTab, elemen) {
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.add('hidden');
+            el.classList.remove('block');
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-600', 'text-white');
+            btn.classList.add('bg-gray-100', 'text-gray-700');
+        });
+        document.getElementById(idTab).classList.remove('hidden');
+        document.getElementById(idTab).classList.add('block');
+        if (elemen) {
+            elemen.classList.remove('bg-gray-100', 'text-gray-700');
+            elemen.classList.add('bg-blue-600', 'text-white');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const defaultButton = document.querySelector('.tab-btn');
+        if (defaultButton) {
+            defaultButton.click();
+        }
+    });
+
     function togglePaymentInfo(select, id) {
         var bankInfo = document.getElementById('bank-info-' + id);
         var ewalletInfo = document.getElementById('ewalet-info-' + id);

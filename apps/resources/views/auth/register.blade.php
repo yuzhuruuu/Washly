@@ -31,8 +31,8 @@
                     <input type="text" name="nama" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Contoh: Zayn Malik" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">No. HP</label>
-                    <input type="text" name="no_hp" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="08123..." required>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">No. WhatsApp</label>
+                    <input type="text" name="no_hp" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Tanpa Nol : 628123..." required>
                 </div>
             </div>
 

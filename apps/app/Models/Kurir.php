@@ -14,7 +14,7 @@ class Kurir extends Authenticatable
     protected $primaryKey = 'id_kurir';
 
     protected $fillable = [
-        'nama', 'username', 'password', 'no_hp', 'status',
+        'nama', 'username', 'password', 'no_hp', 'status', 'notify_new_task',
     ];
 
     protected $hidden = [
@@ -23,6 +23,7 @@ class Kurir extends Authenticatable
 
     protected $casts = [
         'password' => 'hashed',
+        'notify_new_task' => 'boolean',
     ];
 
     // Relasi: Kurir bisa jemput banyak pengiriman
