@@ -35,7 +35,7 @@ class AuthController extends Controller
             'alamat' => $request->alamat,
         ]);
 
-        // Langsung login-kan setelah daftar
+        // Langsung login-kan setelah daftar  
         Auth::guard('pelanggan')->login($pelanggan);
 
         return redirect('/dashboard')->with('success', 'Pendaftaran berhasil! Selamat datang di Washly.');

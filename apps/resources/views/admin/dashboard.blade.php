@@ -258,6 +258,9 @@
                             <input type="text" name="nama" placeholder="Nama Lengkap" class="border-gray-200 rounded-xl p-3 text-sm focus:ring-blue-500" required>
                             <input type="text" name="no_hp" placeholder="Nomor HP (WA)" class="border-gray-200 rounded-xl p-3 text-sm focus:ring-blue-500" required>
                             <input type="text" name="username" placeholder="Username Login" class="border-gray-200 rounded-xl p-3 text-sm focus:ring-blue-500" required>
+                            @error('username')
+                                <p class="text-red-500 text-xs mt-1 font-bold">Username ini udah dipake kurir lain! Ganti dengan yang lain!</p>
+                            @enderror
                             <input type="password" name="password" placeholder="Password" class="border-gray-200 rounded-xl p-3 text-sm focus:ring-blue-500" required>
                             <button type="submit" class="bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold col-span-full py-3 shadow-md transition">Simpan & Aktifkan Kurir</button>
                         </form>
