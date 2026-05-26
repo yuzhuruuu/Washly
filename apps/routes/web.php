@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PesananController;
-use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\AdminController;
 
 // 1. PUBLIC ROUTES
@@ -14,11 +13,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
-// 2. BACKEND ROUTES - PELANGGAN (Dibatasi hanya untuk guard 'pelanggan')
+// 2. BACKEND ROUTES - PELANGGAN
 Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(function () {
     Route::get('/', [PesananController::class, 'pelangganIndex'])->name('pelanggan.dashboard');
-    Route::get('/pesanan-baru', function () { return view('pelanggan.pesanan-baru'); })->name('pelanggan.pesanan.baru');
-    Route::get('/riwayat', [PesananController::class, 'pelangganRiwayat'])->name('pelanggan.riwayat'); // Harus panggil Controller
+    
+    // PENTING: Panggil Controller biar data layanannya muncul!
+    Route::get('/pesanan-baru', [PesananController::class, 'createPesanan'])->name('pelanggan.pesanan.baru');
+    
+    Route::get('/riwayat', [PesananController::class, 'pelangganRiwayat'])->name('pelanggan.riwayat');
     Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
     Route::post('/pesanan/upload-bayar/{id}', [PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
 });

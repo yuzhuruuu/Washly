@@ -25,7 +25,6 @@ class AuthController extends Controller
             'alamat' => 'required|string',
         ]);
 
-        // Simpan ke tabel pelanggans
         Pelanggan::create([
             'nama' => $request->nama,
             'username' => $request->username,
@@ -35,45 +34,38 @@ class AuthController extends Controller
             'alamat' => $request->alamat,
         ]);
 
-        // Auto-login DIMATIKAN. User akan dilempar ke halaman login.
-        return redirect('/login')->with('success', 'Akun berhasil dibuat! Silakan login untuk memesan laundry.');
+        return redirect('/login')->with('success', 'Akun berhasil dibuat! Silakan login.');
     }
 
-    public function login(Request $request)
-    {
-        // Karena di form login kamu atribut namenya masih 'email', kita tangkap pakai 'email'
-        // Tapi kita tetep fleksibel ngecek ini email atau username
-        $identity = $request->input('email') ?? $request->input('login_identity'); 
-        $password = $request->input('password');
+        public function login(Request $request)
+        {
+            $identity = $request->input('email');
+            $password = $request->input('password');
+            $isEmail = filter_var($identity, FILTER_VALIDATE_EMAIL);
 
-        $loginField = filter_var($identity, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+            // 1. Coba login sebagai Admin (bisa pakai email/username)
+            if (Auth::guard('admin')->attempt([($isEmail ? 'email' : 'username') => $identity, 'password' => $password])) {
+                $request->session()->regenerate();
+                return redirect()->intended('/dashboard/admin');
+            }
 
-        // 1. Coba login sebagai Admin
-        if (Auth::guard('admin')->attempt([$loginField => $identity, 'password' => $password])) {
-            $request->session()->regenerate();
-            // Redirect disesuaikan dengan rute FE yang baru
-            return redirect()->intended('/dashboard/admin');
+            // 2. Coba login sebagai Kurir (HANYA BISA PAKAI USERNAME)
+            // Karena tabel kurirs tidak punya kolom email
+            if (Auth::guard('kurir')->attempt(['username' => $identity, 'password' => $password])) {
+                $request->session()->regenerate();
+                return redirect()->intended('/dashboard/kurir');
+            }
+
+            // 3. Coba login sebagai Pelanggan (bisa pakai email/username)
+            if (Auth::guard('pelanggan')->attempt([($isEmail ? 'email' : 'username') => $identity, 'password' => $password])) {
+                $request->session()->regenerate();
+                return redirect()->intended('/dashboard/pelanggan');
+            }
+
+            return back()->withErrors([
+                'email' => 'Login gagal! Pastikan username/email dan password benar.',
+            ]);
         }
-
-        // 2. Coba login sebagai Pelanggan
-        if (Auth::guard('pelanggan')->attempt([$loginField => $identity, 'password' => $password])) {
-            $request->session()->regenerate();
-            // Redirect disesuaikan dengan rute FE yang baru
-            return redirect()->intended('/dashboard/pelanggan');
-        }
-
-        // 3. Coba login sebagai Kurir
-        if (Auth::guard('kurir')->attempt([$loginField => $identity, 'password' => $password])) {
-            $request->session()->regenerate();
-            // Redirect disesuaikan dengan rute FE yang baru
-            return redirect()->intended('/dashboard/kurir');
-        }
-
-        // Jika semua gagal (Password / Email salah)
-        return back()->withErrors([
-            'email' => 'Email/Username atau password salah!',
-        ])->onlyInput('email');
-    }
 
     public function showLoginForm()
     {
@@ -82,7 +74,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Logout dari semua guard yang mungkin sedang aktif
         Auth::guard('admin')->logout();
         Auth::guard('pelanggan')->logout();
         Auth::guard('kurir')->logout();
