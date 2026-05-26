@@ -1,83 +1,109 @@
 <?php
 
-use App\Http\Controllers\PesananController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PembayaranController;
-use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\PasswordController;
 
-// --- Halaman Utama (Public) ---
+// ==========================================
+// 1. GLOBAL & AUTHENTICATION ROUTES
+// ==========================================
 Route::get('/', function () {
     return view('welcome');
 });
 
-// --- Authentication Routes ---
-// Kita buat manual karena kita pakai Multi-Auth Custom
+// Login & Logout
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-// ==========================================
-// AREA PELANGGAN (User Biasa)
-// ==========================================
-Route::middleware(['auth:pelanggan'])->group(function () {
-    
-    Route::get('/dashboard', [PesananController::class, 'pelangganIndex'])->name('dashboard');
-
-    // Manajemen Pesanan
-    Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
-
-    // Manajemen Pembayaran
-    Route::get('/pembayaran/{id}', [PembayaranController::class, 'create'])->name('pembayaran.create');
-    Route::post('/pembayaran', [PembayaranController::class, 'store'])->name('pembayaran.store');
-
-    // Profile (Opsional kalau mau tetap ada)
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update'); // <--- INI KUNCINYA
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::put('/password', [App\Http\Controllers\Auth\PasswordController::class, 'update'])->name('password.update');
-});
-
-
-// ==========================================
-// AREA ADMIN
-// ==========================================
-Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
-    
-    Route::get('/dashboard', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
-
-    // 1. INPUT TIMBANGAN
-    Route::patch('/pesanan/{id}/timbang', [PesananController::class, 'inputTimbangan'])
-        ->name('pesanan.updateTimbangan');
-
-    // 2. KONFIRMASI BAYAR (Validasi bukti transfer)
-    Route::patch('/pembayaran/{id}/konfirmasi', [PembayaranController::class, 'konfirmasi'])
-        ->name('pembayaran.konfirmasi');
-
-    // 3. UPDATE STATUS (Alur: Cuci -> Selesai)
-    Route::patch('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])
-        ->name('pesanan.updateStatus');
-
-    // Rute untuk simpan perubahan berat dan kurir
-    Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
-
-    Route::post('/kurir/store', [App\Http\Controllers\AdminController::class, 'storeKurir'])->name('admin.kurir.store');
-
-    Route::post('/admin/pesanan/manual', [App\Http\Controllers\PesananController::class, 'storeManual'])->name('pesanan.storeManual');
-});
-
-
-// ==========================================
-// AREA KURIR
-// ==========================================
-Route::middleware(['auth:kurir'])->prefix('kurir')->group(function () {
-    // Pastikan ini mengarah ke folder kurir.dashboard
-    Route::get('/dashboard', [PesananController::class, 'kurirIndex'])->name('kurir.dashboard');
-
-    Route::post('/kurir/tugas/{id}/selesaikan', [App\Http\Controllers\PesananController::class, 'kurirSelesaikanTugas'])->name('kurir.tugas.selesai');
-});
-
+// Register
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/pesanan/upload-bayar/{id}', [App\Http\Controllers\PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
+Route::get('/register-address', function () {
+    return view('auth.register-address'); 
+})->name('register.address');
+
+
+// ==========================================
+// 2. AREA JALUR TIKUS FE ASHA 💅 (Mockup UI)
+// ==========================================
+
+// --- FE Pelanggan ---
+Route::get('/dashboard/pelanggan', function () { return view('pelanggan.dashboard'); });
+Route::get('/layanan/pesan', function () { return view('pelanggan.pesanan-baru'); });
+Route::get('/pembayaran/demo', function () { return view('pelanggan.pembayaran'); });
+Route::get('/pesanan/status', function () { return view('pelanggan.status-pesanan'); });
+Route::get('/profil', function () { return view('pelanggan.profil'); });
+Route::get('/riwayat', function () { return view('pelanggan.riwayat'); });
+
+// --- FE Admin (Dikemas pakai Prefix biar rapi) ---
+Route::prefix('dashboard/admin')->group(function () {
+    Route::get('/', function () { return view('admin.dashboard'); });
+    Route::get('/pesanan', function () { return view('admin.kelola-pesanan'); });
+    Route::get('/pesanan/detail', function () { return view('admin.detail-pesanan'); });
+    Route::get('/pembayaran', function () { return view('admin.pembayaran'); });
+    Route::get('/kurir', function () { return view('admin.kurir'); });
+    Route::get('/riwayat', function () { return view('admin.riwayat'); });
+    Route::get('/pengaturan', function () { return view('admin.pengaturan'); });
+});
+
+// --- FE Kurir (Dikemas pakai Prefix biar rapi) ---
+Route::prefix('dashboard/kurir')->group(function () {
+    Route::get('/', function () { return view('kurir.dashboard'); });
+    Route::get('/profil', function () { return view('kurir.profil'); });
+    Route::get('/riwayat', function () { return view('kurir.riwayat'); });
+    Route::get('/pengaturan', function () { return view('kurir.pengaturan'); });
+});
+
+
+// ==========================================
+// 3. BACKEND ROUTES - PELANGGAN
+// ==========================================
+Route::middleware(['auth:pelanggan'])->group(function () {
+    Route::get('/dashboard', [PesananController::class, 'pelangganIndex'])->name('dashboard');
+
+    // Manajemen Pesanan & Pembayaran
+    Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
+    Route::get('/pembayaran/{id}', [PembayaranController::class, 'create'])->name('pembayaran.create');
+    Route::post('/pembayaran', [PembayaranController::class, 'store'])->name('pembayaran.store');
+    Route::post('/pesanan/upload-bayar/{id}', [PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
+
+    // Profil Pelanggan
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+});
+
+
+// ==========================================
+// 4. BACKEND ROUTES - ADMIN
+// ==========================================
+Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
+    // Route::get('/dashboard', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
+
+    // Manajemen Pesanan
+    Route::patch('/pesanan/{id}/timbang', [PesananController::class, 'inputTimbangan'])->name('pesanan.updateTimbangan');
+    Route::patch('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
+    Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
+    Route::post('/pesanan/manual', [PesananController::class, 'storeManual'])->name('pesanan.storeManual');
+
+    // Konfirmasi Bayar & Kurir
+    Route::patch('/pembayaran/{id}/konfirmasi', [PembayaranController::class, 'konfirmasi'])->name('pembayaran.konfirmasi');
+    Route::post('/kurir/store', [AdminController::class, 'storeKurir'])->name('admin.kurir.store');
+});
+
+
+// ==========================================
+// 5. BACKEND ROUTES - KURIR
+// ==========================================
+Route::middleware(['auth:kurir'])->prefix('kurir')->group(function () {
+    Route::get('/dashboard', [PesananController::class, 'kurirIndex'])->name('kurir.dashboard');
+    
+    // Penyelesaian Tugas
+    Route::post('/tugas/{id}/selesaikan', [PesananController::class, 'kurirSelesaikanTugas'])->name('kurir.tugas.selesai');
+});

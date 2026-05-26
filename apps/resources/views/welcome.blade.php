@@ -1,38 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selamat Datang di Washly</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Washly - Laundry Bersih, Hidup Lebih Ringan</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-gray-100 h-screen flex items-center justify-center">
-    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg text-center">
-        <h1 class="text-4xl font-extrabold text-blue-600 mb-2">Washly</h1>
-        <p class="text-gray-500 mb-8">Laundry Kilat, Beres Gak Pakai Ribet!</p>
+<body class="bg-[#F4F7FB] min-h-screen flex flex-col items-center justify-center relative overflow-hidden font-sans text-slate-800">
 
-        @if (Route::has('login'))
-            <div class="space-y-4">
-                @auth
-                    {{-- Kalau user sudah login, kasih tombol ke dashboard sesuai role --}}
-                    <p class="text-sm text-gray-600 mb-2">Kamu sudah masuk sebagai <b>{{ Auth::user()->nama ?? 'User' }}</b></p>
-                    <a href="{{ url('/dashboard') }}" class="block w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-blue-700 transition">
-                        Buka Dashboard
-                    </a>
-                @else
-                    {{-- Kalau belum login, kasih pilihan Login atau Register --}}
-                    <a href="{{ route('login') }}" class="block w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-blue-700 transition">
-                        Masuk (Login)
-                    </a>
+    {{-- Lingkaran Dekorasi Background --}}
+    <div class="absolute top-10 left-10 w-24 h-24 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute bottom-20 left-4 w-32 h-32 bg-cyan-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute top-20 right-20 w-16 h-16 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+    <div class="absolute bottom-10 right-32 w-24 h-24 bg-cyan-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
 
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="block w-full bg-white text-blue-600 border-2 border-blue-600 font-bold py-3 rounded-xl hover:bg-blue-50 transition">
-                            Daftar Pelanggan Baru
-                        </a>
-                    @endif
-                @endauth
-            </div>
-        @endif
+    {{-- Konten Utama --}}
+    <div class="z-10 text-center max-w-lg px-8 flex flex-col items-center">
+        {{-- Logo (Bisa diganti pakai tag <img> kalau kamu udah export logo SVG-nya) --}}
+        {{-- Konten Utama --}}      
+        <img src="{{ asset('images/w-g.svg') }}" alt="Washly Logo" class="w-[230px] h-auto">
+        <div class="h-[70px] w-full"></div>
+
+        <h1 class="text-2xl font-bold mb-4 w-full">Laundry Bersih, Hidup Lebih Ringan.</h1>
+        <p class="text-sm text-slate-500 mb-10 leading-relaxed px-4">
+            Nikmati kemudahan layanan laundry on-demand yang cepat, bersih, dan wangi. Cukup pesan dari perangkat Anda, kami yang urus sisanya.
+        </p>
+
+        <a href="{{ route('login') }}" class="w-[250px] flex justify-center items-center bg-gradient-to-r from-[#0085BE] to-[#005B82] hover:from-[#0074A6] hover:to-[#004B6D] text-white font-semibold py-3.5 rounded-full transition-all duration-300 shadow-lg shadow-[#0074A6]/30">
+            Login
+        </a>
+
+        <p class="mt-8 text-sm text-slate-500">
+            Belum punya akun? <a href="{{ route('register') }}" class="text-[#0074A6] font-semibold hover:underline">Daftar sekarang &rarr;</a>
+        </p>
     </div>
+
 </body>
 </html>

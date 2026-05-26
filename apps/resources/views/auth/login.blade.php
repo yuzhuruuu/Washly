@@ -1,50 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Washly</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login - Washly</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- CDN FontAwesome untuk icon mata di password --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-blue-50 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-blue-100">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-blue-600">Washly</h2>
-            <p class="text-gray-500 text-sm mt-1">Sistem Manajemen Laundry Cerdas</p>
+<body class="bg-[#F4F7FB] min-h-screen flex items-center justify-center relative px-4">
+    
+    <div class="bg-white rounded-[2rem] shadow-xl shadow-blue-900/5 p-8 w-full max-w-sm text-center relative z-10">
+        {{-- Logo --}}
+        <div class="flex justify-center mb-6">
+            <img src="{{ asset('images/w-g.svg') }}" alt="Washly Logo" class="h-auto w-[120px]">
         </div>
+        
+        <h2 class="text-lg font-bold text-gray-800 mb-8">Selamat Datang Kembali</h2>
 
-        {{-- Alert kalau ada error (misal password salah) --}}
-        @if($errors->any())
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 rounded mb-6 text-sm">
-                {{ $errors->first() }}
+        <form action="{{ route('login') }}" method="POST" class="space-y-5 text-left">
+            @csrf
+            
+            {{-- Input Email --}}
+            <div>
+                <label class="block text-[11px] font-bold text-gray-400 mb-1">Email</label>
+                <div class="relative">
+                    {{-- FIX: top-1/2 -translate-y-1/2 biar rata tengah sempurna --}}
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"><i class="far fa-envelope"></i></span>
+                    <input type="email" name="email" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="Masukkan email / username Anda">
+                </div>
             </div>
-        @endif
 
-        {{-- Form Login menembak ke Route POST /login --}}
-        <form action="{{ route('login') }}" method="POST">
-            @csrf {{-- <--- INI WAJIB ADA --}}
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email / Username</label>
-                <input type="text" name="login_identity" value="{{ old('login_identity') }}" 
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500" 
-                    placeholder="Masukkan email atau username" required>
+            {{-- Input Password --}}
+            <div>
+                <label class="block text-[11px] font-bold text-gray-400 mb-1">Password</label>
+                <div class="relative" x-data="{ show: false }">
+                    {{-- FIX: top-1/2 -translate-y-1/2 --}}
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"><i class="fas fa-lock"></i></span>
+                    <input :type="show ? 'text' : 'password'" name="password" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-10 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="••••••••">
+                    {{-- FIX: Icon mata juga disamain biar presisi --}}
+                    <button type="button" @click="show = !show" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i :class="show ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                    </button>
+                </div>
             </div>
-            
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" name="password" 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
-                       placeholder="********" required>
+
+            <div class="text-right">
+                <a href="#" class="text-[11px] font-semibold text-[#0074A6] hover:underline">Lupa password?</a>
             </div>
-            
-            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition shadow-md">
+
+            <button type="submit" class="w-full flex justify-center items-center bg-gradient-to-r from-[#0085BE] to-[#005B82] hover:from-[#0074A6] hover:to-[#004B6D] text-white font-semibold py-3.5 rounded-full transition-all duration-300 shadow-lg shadow-[#0074A6]/30 mt-2">
                 Masuk
             </button>
         </form>
 
-        <p class="text-center text-sm text-gray-600 mt-6">
-            Belum jadi pelanggan? <a href="{{ url('/register') }}" class="text-blue-600 font-bold hover:underline">Daftar sekarang</a>
-        </p>
+        <div class="mt-8 border-t border-gray-100 pt-6">
+            <p class="text-xs text-gray-500">
+                Belum punya akun? <a href="{{ route('register') }}" class="text-[#0074A6] font-bold hover:underline">Daftar sekarang</a>
+            </p>
+        </div>
     </div>
 </body>
 </html>
