@@ -45,10 +45,10 @@
                 <i class="fas fa-motorcycle w-5 text-center"></i> Kurir
             </a>
             
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ url('/dashboard/admin/riwayat') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-history w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Riwayat Admin
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ url('/dashboard/admin/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-cog w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Pengaturan
             </a>
         </nav>
@@ -60,15 +60,15 @@
         </div>
     </aside>
 
-    {{-- KONTEN UTAMA (Udah Terlihat oleh Mata Manusia Biasa!) --}}
-    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ showModal: false }">
+    {{-- KONTEN UTAMA --}}
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ showModal: {{ $errors->has('username') ? 'true' : 'false' }} }">
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
         <div class="p-10 max-w-6xl mx-auto relative z-10">
             
-            {{-- 6. Header Diperbesar & 4. Tombol Tambah Kurir Anti-Gaib --}}
+            {{-- Header & Tombol Tambah --}}
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-4xl font-black text-gray-800 mb-2">Kelola Kurir</h1>
@@ -79,7 +79,14 @@
                 </button>
             </div>
 
-            {{-- 1. Action Bar (Jarak Teks Search & Icon Udah Dijauhin pakai pl-12) --}}
+            {{-- Flash Notification Status --}}
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-200 text-green-700 px-5 py-3 rounded-2xl text-xs font-bold shadow-sm mb-6 flex items-center gap-2">
+                    <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Action Bar --}}
             <div class="flex gap-4 mb-8">
                 <div class="relative flex-1">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -99,121 +106,66 @@
                     <table class="w-full text-left">
                         <thead>
                             <tr class="border-b border-gray-100 bg-gray-50/50">
-                                <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[30%]">Nama Kurir</th>
+                                <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[35%]">Nama Kurir</th>
                                 <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[20%]">Username</th>
                                 <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[20%]">No. HP</th>
                                 <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[15%]">Status</th>
-                                <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[15%] text-right">Aksi</th>
+                                <th class="py-4 px-6 text-[10px] font-bold text-gray-400 uppercase tracking-wider w-[10%] text-right">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm font-medium">
-                            {{-- Row 1 --}}
-                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://i.pravatar.cc/150?img=11" alt="Baskara" class="w-10 h-10 rounded-full object-cover border border-gray-100">
-                                        <div>
-                                            <p class="font-bold text-[#1D5D8A]">Baskara</p>
-                                            <p class="text-[10px] text-gray-400">Bergabung: 12 Jan 2024</p>
+                            @forelse($daftar_kurir ?? [] as $kurir)
+                                <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center gap-3">
+                                            {{-- UI Avatar dinamis berdasarkan nama kurir --}}
+                                            <img src="https://ui-avatars.com/api/?name={{ urlencode($kurir->nama) }}&background=E0F2FE&color=0369A1&bold=true" alt="{{ $kurir->nama }}" class="w-10 h-10 rounded-full object-cover border border-gray-50">
+                                            <div>
+                                                <p class="font-bold text-[#1D5D8A]">{{ $kurir->nama }}</p>
+                                                <p class="text-[10px] text-gray-400">Terdaftar: {{ $kurir->created_at ? $kurir->created_at->format('d M Y') : 'N/A' }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-600">hindia.bas</td>
-                                <td class="py-4 px-6 text-gray-600 flex items-center gap-2"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> 0812-3456-7890</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-md border border-green-100">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> AKTIF
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right space-x-2">
-                                    <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
-                            
-                            {{-- Row 2 --}}
-                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://i.pravatar.cc/150?img=12" alt="Maulana" class="w-10 h-10 rounded-full object-cover border border-gray-100">
-                                        <div>
-                                            <p class="font-bold text-[#1D5D8A]">Maulana</p>
-                                            <p class="text-[10px] text-gray-400">Bergabung: 15 Jan 2024</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-600">maulana_</td>
-                                <td class="py-4 px-6 text-gray-600 flex items-center gap-2"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> 0813-8877-6655</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-md border border-gray-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> OFF DUTY
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right space-x-2">
-                                    <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
-
-                            {{-- Row 3 - 2. Dot Sibuk Udah Dikasih Inline Style Biar Gaibnya Hilang! --}}
-                            <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://i.pravatar.cc/150?img=13" alt="Adrian" class="w-10 h-10 rounded-full object-cover border border-gray-100">
-                                        <div>
-                                            <p class="font-bold text-[#1D5D8A]">Adrian</p>
-                                            <p class="text-[10px] text-gray-400">Bergabung: 20 Jan 2024</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-600">wijayadrian</td>
-                                <td class="py-4 px-6 text-gray-600 flex items-center gap-2"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> 0857-1122-3344</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md border border-yellow-100">
-                                        <span class="w-1.5 h-1.5 rounded-full" style="background-color: #F59E0B;"></span> SIBUK
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right space-x-2">
-                                    <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
-
-                            {{-- Row 4 --}}
-                            <tr class="hover:bg-gray-50/50 transition">
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://i.pravatar.cc/150?img=14" alt="Sal Priadi" class="w-10 h-10 rounded-full object-cover border border-gray-100">
-                                        <div>
-                                            <p class="font-bold text-[#1D5D8A]">Sal Priadi</p>
-                                            <p class="text-[10px] text-gray-400">Bergabung: 05 Feb 2024</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-600">amin_plg_srs</td>
-                                <td class="py-4 px-6 text-gray-600 flex items-center gap-2"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> 0899-2233-4455</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-md border border-green-100">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> AKTIF
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right space-x-2">
-                                    <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
-                                    <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600 font-mono text-xs bg-gray-50/50 rounded px-2">{{ $kurir->username }}</td>
+                                    <td class="py-4 px-6 text-gray-600 flex items-center gap-2 h-full my-auto"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> {{ $kurir->no_hp }}</td>
+                                    <td class="py-4 px-6">
+                                        {{-- Deteksi status tugas aktif kurir secara otomatis --}}
+                                        @php 
+                                            $sedangSibuk = $kurir->pesanan ? $kurir->pesanan()->whereIn('status', ['menunggu_pickup', 'delivery'])->count() : 0; 
+                                        @endphp
+                                        
+                                        @if($sedangSibuk > 0)
+                                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-yellow-600 bg-yellow-50 px-2.5 py-1 rounded-md border border-yellow-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> SIBUK ({{ $sedangSibuk }} TUGAS)
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 bg-green-50 px-2.5 py-1 rounded-md border border-green-100">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> AKTIF / STANDBY
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 px-6 text-right space-x-2">
+                                        <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
+                                        <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center text-gray-400 font-medium italic">
+                                        <i class="fas fa-user-slash text-xl mb-2 block text-gray-300"></i> Belum ada mitra kurir terdaftar ege.
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
                 
-                {{-- 3. Pagination (Angka 1 Udah Keliatan Jelas) --}}
+                {{-- Pagination Statis --}}
                 <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-gray-50/30">
-                    <p class="text-xs text-gray-500 font-medium">Menampilkan 4 dari 24 kurir terdaftar</p>
+                    <p class="text-xs text-gray-500 font-medium">Total: {{ count($daftar_kurir ?? []) }} Petugas Logistik</p>
                     <div class="flex gap-1">
                         <button class="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition"><i class="fas fa-chevron-left text-xs"></i></button>
                         <button class="w-8 h-8 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm" style="background-color: #1D5D8A;">1</button>
-                        <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 font-bold text-xs flex items-center justify-center hover:bg-gray-100 transition">2</button>
-                        <button class="w-8 h-8 rounded-lg border border-gray-200 text-gray-600 font-bold text-xs flex items-center justify-center hover:bg-gray-100 transition">3</button>
                         <button class="w-8 h-8 rounded-lg border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition"><i class="fas fa-chevron-right text-xs"></i></button>
                     </div>
                 </div>
@@ -221,7 +173,7 @@
 
             {{-- Summary Cards Bawah --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {{-- 5. Card Total Kurir (Icon-nya Udah Muncul!) --}}
+                {{-- Total Kurir Dinamis --}}
                 <div class="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 flex flex-col justify-between">
                     <div class="flex items-start gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl text-white flex items-center justify-center text-xl shrink-0" style="background-color: #1D5D8A;">
@@ -229,10 +181,10 @@
                         </div>
                         <div>
                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Total Kurir</p>
-                            <h3 class="text-3xl font-black text-gray-800">24</h3>
+                            <h3 class="text-3xl font-black text-gray-800">{{ count($daftar_kurir ?? []) }}</h3>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 font-medium">Jumlah kurir aktif yang terintegrasi dalam sistem Washly per hari ini.</p>
+                    <p class="text-xs text-gray-500 font-medium">Jumlah kurir aktif yang terintegrasi dalam ekosistem operasional Washly.</p>
                 </div>
 
                 {{-- Card Pengiriman --}}
@@ -242,15 +194,15 @@
                             <i class="fas fa-truck"></i>
                         </div>
                         <div class="w-full">
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Pengiriman Hari Ini</p>
-                            <h3 class="text-3xl font-black text-red-600">156</h3>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Kapasitas Tugas</p>
+                            <h3 class="text-3xl font-black text-red-600">Active</h3>
                         </div>
                     </div>
                     <div>
                         <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1.5 overflow-hidden">
-                            <div class="h-1.5 rounded-full" style="width: 75%; background-color: #1D5D8A;"></div>
+                            <div class="h-1.5 rounded-full" style="width: 40%; background-color: #1D5D8A;"></div>
                         </div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">75% Kapasitas Terpakai</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Sistem Penjemputan Siap</p>
                     </div>
                 </div>
 
@@ -261,22 +213,19 @@
                             <i class="fas fa-star"></i>
                         </div>
                         <div>
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Rata-Rata Rating</p>
-                            <h3 class="text-3xl font-black text-gray-800">4.8<span class="text-lg text-gray-400 font-semibold">/5.0</span></h3>
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Indeks Kepuasan</p>
+                            <h3 class="text-3xl font-black text-gray-800">4.9<span class="text-lg text-gray-400 font-semibold">/5.0</span></h3>
                         </div>
                     </div>
-                    <div class="flex items-center gap-1">
-                        <img src="https://i.pravatar.cc/150?img=11" class="w-7 h-7 rounded-full border-2 border-white object-cover">
-                        <img src="https://i.pravatar.cc/150?img=12" class="w-7 h-7 rounded-full border-2 border-white object-cover -ml-3">
-                        <img src="https://i.pravatar.cc/150?img=13" class="w-7 h-7 rounded-full border-2 border-white object-cover -ml-3">
-                        <span class="text-[10px] font-bold text-gray-400 ml-2">+21</span>
+                    <div class="text-xs text-[#F59E0B] font-bold flex items-center gap-1">
+                        <i class="fas fa-shield-alt"></i> Mitra Driver Terpercaya
                     </div>
                 </div>
             </div>
 
         </div>
 
-        {{-- MODAL TAMBAH KURIR BARU (Tombol Simpan Juga Udah Dibenerin) --}}
+        {{-- MODAL TAMBAH KURIR BARU --}}
         <div x-cloak x-show="showModal" 
              class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
              x-transition:enter="transition ease-out duration-300"
@@ -306,42 +255,54 @@
                          </div>
                      </div>
 
-                     <form action="#" method="POST" class="space-y-5">
+                     {{-- DIHUBUNGKAN KE ROUTE STORE KURIR DI ADMINCONTROLLER --}}
+                     <form action="{{ route('admin.kurir.store') }}" method="POST" class="space-y-5">
+                         @csrf
+                         
+                         {{-- Input Nama --}}
                          <div>
                              <label class="block text-xs font-semibold text-gray-600 mb-2">Nama Lengkap</label>
                              <div class="relative">
                                  <i class="far fa-id-card absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                 <input type="text" placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition">
+                                 <input type="text" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Budi Santoso" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                              </div>
                          </div>
 
                          <div class="grid grid-cols-2 gap-4">
+                             {{-- Input Username --}}
                              <div>
                                  <label class="block text-xs font-semibold text-gray-600 mb-2">Username</label>
                                  <div class="relative">
                                      <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                     <input type="text" placeholder="budi_washly" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition">
+                                     <input type="text" name="username" value="{{ old('username') }}" placeholder="budi_washly" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                                  </div>
+                                 {{-- Error Warning Username Kembar --}}
+                                 @error('username')
+                                     <p class="text-red-500 text-[10px] mt-1 font-bold">❌ Username sudah terpakai ege!</p>
+                                 @enderror
                              </div>
+                             
+                             {{-- Input Nomor HP --}}
                              <div>
                                  <label class="block text-xs font-semibold text-gray-600 mb-2">Nomor HP</label>
                                  <div class="relative">
                                      <i class="fas fa-mobile-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                     <input type="text" placeholder="0812xxxxxxx" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition">
+                                     <input type="text" name="no_hp" value="{{ old('no_hp') }}" placeholder="0812xxxxxxx" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                                  </div>
                              </div>
                          </div>
 
+                         {{-- Input Password --}}
                          <div>
                              <label class="block text-xs font-semibold text-gray-600 mb-2">Password</label>
                              <div class="relative">
                                  <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                 <input type="password" placeholder="Min. 8 karakter" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-10 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition">
-                                 <i class="far fa-eye absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-600"></i>
+                                 <input type="password" name="password" placeholder="Min. 8 karakter" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-10 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                              </div>
-                             <p class="text-[10px] text-gray-400 mt-2">Gunakan kombinasi huruf, angka, dan simbol untuk keamanan ekstra.</p>
+                             <p class="text-[10px] text-gray-400 mt-2">Gunakan kombinasi password yang kuat untuk menjaga privasi akun petugas.</p>
                          </div>
 
+                         {{-- Tombol Submit --}}
                          <div class="flex gap-3 pt-2">
                              <button type="submit" class="flex-1 text-white py-3.5 rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #1D5D8A;">
                                  <i class="fas fa-save"></i> Simpan Kurir

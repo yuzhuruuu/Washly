@@ -27,7 +27,7 @@ class AdminController extends Controller
         $daftar_kurir = Kurir::all();
         $daftar_layanan = Layanan::all(); 
 
-        return view('admin.dashboard', compact('stats', 'semua_pesanan', 'pesanan_terbaru', 'daftar_kurir', 'daftar_layanan'));
+        return view('admin.kelola-pesanan', compact('stats', 'semua_pesanan', 'pesanan_terbaru', 'daftar_kurir', 'daftar_layanan'));
     }
 
     public function storeKurir(Request $request)

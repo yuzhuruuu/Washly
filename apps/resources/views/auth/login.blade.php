@@ -21,13 +21,13 @@
         <form action="{{ route('login') }}" method="POST" class="space-y-5 text-left">
             @csrf
             
-            {{-- Input Email --}}
+            {{-- Input Email atau Username--}}
             <div>
                 <label class="block text-[11px] font-bold text-gray-400 mb-1">Email</label>
                 <div class="relative">
                     {{-- FIX: top-1/2 -translate-y-1/2 biar rata tengah sempurna --}}
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"><i class="far fa-envelope"></i></span>
-                    <input type="email" name="email" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="Masukkan email / username Anda">
+                    <input type="text" name="email" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="Masukkan email / username Anda">
                 </div>
             </div>
 
