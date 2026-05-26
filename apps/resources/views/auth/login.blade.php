@@ -23,12 +23,16 @@
             
             {{-- Input Email atau Username--}}
             <div>
-                <label class="block text-[11px] font-bold text-gray-400 mb-1">Email</label>
+                <label class="block text-[11px] font-bold text-gray-400 mb-1">Email / Username</label>
                 <div class="relative">
-                    {{-- FIX: top-1/2 -translate-y-1/2 biar rata tengah sempurna --}}
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"><i class="far fa-envelope"></i></span>
-                    <input type="text" name="email" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="Masukkan email / username Anda">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"><i class="far fa-user"></i></span>
+                    <input type="text" name="email" value="{{ old('email') }}" required class="w-full bg-[#F8FAFC] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-600" placeholder="Masukkan email / username Anda">
                 </div>
+                
+                {{-- INI DIA FITUR MUNCULIN PESAN ERRORNYA --}}
+                @error('email')
+                    <p class="text-red-500 text-[10px] font-bold mt-1">❌ {{ $message }}</p>
+                @enderror
             </div>
 
             {{-- Input Password --}}
