@@ -201,7 +201,42 @@
 
             </div>
         </div>
+<<<<<<< HEAD
     </main>
+=======
+        @empty
+        <div class="bg-white border-2 border-dashed border-gray-200 rounded-2xl p-10 text-center">
+            <p class="text-gray-400 text-sm italic">Belum ada tugas buat kamu!</p>
+        </div>
+        @endforelse
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <a href="{{ route('kurir.dashboard') }}" class="flex flex-col items-center text-blue-600">
+            <i class="fas fa-home text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">TUGAS</span>
+        </a>
+        <a href="{{ route('kurir.history') }}" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-history text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">RIWAYAT</span>
+        </a>
+        <a href="{{ route('kurir.profile.edit') }}" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-id-badge text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">PROFIL</span>
+        </a>
+        <a href="{{ route('kurir.settings.edit') }}" class="flex flex-col items-center text-gray-400">
+            <i class="fas fa-cog text-xl"></i>
+            <span class="text-[10px] mt-1 font-bold">PENGATURAN</span>
+        </a>
+        <form action="{{ route('logout') }}" method="POST" class="inline">
+            @csrf
+            <button type="submit" class="flex flex-col items-center text-red-400">
+                <i class="fas fa-power-off text-xl"></i>
+                <span class="text-[10px] mt-1 font-bold">KELUAR</span>
+            </button>
+        </form>
+    </nav>
+>>>>>>> 0d7885c6d42e58a5a7b3c3b1e67b0b34d2c58639
 
 </body>
 </html>

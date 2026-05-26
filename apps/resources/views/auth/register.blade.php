@@ -21,6 +21,45 @@
 
         <form action="{{ route('register') }}" method="POST" class="space-y-3 text-left">
             @csrf
+<<<<<<< HEAD
+=======
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Nama Lengkap</label>
+                    <input type="text" name="nama" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Contoh: Zayn Malik" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">No. WhatsApp</label>
+                    <input type="text" name="no_hp" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Tanpa Nol : 628123..." required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Email</label>
+                <input type="email" name="email" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="nama@email.com" required>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Username</label>
+                <input type="text" name="username" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Username" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Alamat Lengkap</label>
+                <textarea name="alamat" rows="2" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Jl. Raya Banaran..." required></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Password</label>
+                    <input type="password" name="password" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="********" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-xs font-bold mb-1 uppercase">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" class="w-full px-4 py-2 border rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="********" required>
+                </div>
+            </div>
+>>>>>>> 0d7885c6d42e58a5a7b3c3b1e67b0b34d2c58639
             
             {{-- Nama Lengkap --}}
             <div class="relative">

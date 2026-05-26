@@ -1,11 +1,11 @@
 # 🧺 Washly - Laundry Booking System (Web-Based)
 
-## 📌 Deskripsi Proyek
+## Deskripsi Proyek
 Washly adalah aplikasi berbasis web yang dirancang untuk membantu digitalisasi layanan laundry UMKM. Sistem ini memungkinkan pelanggan melakukan pemesanan layanan laundry secara online serta memudahkan admin dalam mengelola pesanan.
 
 ---
 
-## 🎯 Tujuan
+## Tujuan
 - Mempermudah proses booking laundry tanpa harus manual (chat/telepon)
 - Mengurangi kesalahan pencatatan pesanan
 - Memberikan informasi status pesanan secara real-time
@@ -13,36 +13,40 @@ Washly adalah aplikasi berbasis web yang dirancang untuk membantu digitalisasi l
 
 ---
 
-## 👥 Tim Pengembang
+## Tim Pengembang
 Proyek ini dikembangkan oleh:  
 
 - Ananda Khairu  A
-  📧 anandakhairu3108@students.unnes.ac.id
+  anandakhairu3108@students.unnes.ac.id
 
 - Annisa Yusri N R
-  📧 yusriannisa@students.unnes.ac.id 
+  yusriannisa@students.unnes.ac.id 
 
 - Fathimah Shaffa  A
-  📧 shaffaftm@students.unnes.ac.id  
+  shaffaftm@students.unnes.ac.id  
 
 ---
 
-## 🧩 Fitur Utama
+## Fitur Utama
 
-### 👤 User (Pelanggan)
+### User (Pelanggan)
 - Registrasi dan Login
 - Melakukan booking laundry
 - Melihat status pesanan
 - Melihat riwayat pesanan
 
-### 🛠️ Admin (Owner)
+### Admin (Owner)
 - Melihat daftar pesanan
 - Mengelola pesanan (lihat, ubah, hapus)
 - Mengupdate status pesanan
 
+### Kurir
+- Mendapat tugas pengiriman dari admin
+- Pickup-delivery pesanan
+
 ---
 
-## 🗂️ Struktur Sistem
+## Struktur Sistem
 
 ### 🔄 ...
 
@@ -52,7 +56,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## ⚙️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 - Frontend: HTML, CSS, JavaScript, ...
 - Backend: Laravel
 - Database: MySQL
@@ -60,7 +64,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## 🌐 Cara Menjalankan Proyek
+## Cara Menjalankan Proyek
 
 1. Clone repository ini
 ```bash

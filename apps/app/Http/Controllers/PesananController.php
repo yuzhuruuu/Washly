@@ -25,20 +25,37 @@ class PesananController extends Controller
             'perlu_diproses' => Pesanan::whereIn('status', ['menunggu_pickup', 'menunggu_timbang'])->count(),
         ];
 
-        // REVISI: Eager Loading 'kurir' dan 'pelanggan' biar gak berat
-        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir'])->latest()->get();
+        // REVISI: Eager Loading 'kurir', 'pelanggan', dan 'pembayaran' biar bukti bayar bisa ditampilkan
+        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->latest()->get();
         $pesanan_terbaru = $semua_pesanan->take(5);
+        $jumlah_pesanan = $semua_pesanan->count();
+        $total_pendapatan_semua = $semua_pesanan->sum('total_harga');
+        $rata_rata_berat = round($semua_pesanan->where('berat', '>', 0)->avg('berat') ?? 0, 2);
 
         // REVISI: Admin butuh liat semua kurir (termasuk yang sibuk) buat ditugaskan
-        $daftar_kurir = Kurir::all(); 
+        $daftar_kurir = Kurir::all();
         $daftar_layanan = Layanan::all();
+        $daftar_pembayaran = \App\Models\Pembayaran::with(['pesanan.pelanggan'])->latest()->get();
+
+        $admin = auth('admin')->user();
+        $toko_profil = [
+            'nama' => 'Washly Laundry',
+            'alamat' => 'Jl. Melati No. 12, Bandung',
+            'jam_operasional' => 'Senin - Sabtu, 08:00 - 20:00',
+        ];
 
         return view('admin.dashboard', compact(
-            'stats', 
-            'semua_pesanan', 
-            'pesanan_terbaru', 
-            'daftar_kurir', 
-            'daftar_layanan'
+            'stats',
+            'semua_pesanan',
+            'pesanan_terbaru',
+            'jumlah_pesanan',
+            'total_pendapatan_semua',
+            'rata_rata_berat',
+            'daftar_kurir',
+            'daftar_layanan',
+            'daftar_pembayaran',
+            'admin',
+            'toko_profil'
         ));
     }
 
@@ -51,17 +68,26 @@ class PesananController extends Controller
             'id_kurir' => 'nullable|exists:kurirs,id_kurir',
             'status' => 'required',
             'berat' => 'nullable|numeric|min:0',
+            'validasi_pembayaran' => 'nullable|boolean',
         ]);
 
         $hargaPerKg = $pesanan->layanan->harga_per_kg ?? 0;
         $beratBaru = $request->berat ?? $pesanan->berat;
-        $totalHargaBaru = $beratBaru * $hargaPerKg;
+        $ongkir = 5000; // Ongkir tetap untuk jemput & antar di wilayah sekitar
+        if ($beratBaru > 0) {
+            $totalHargaBaru = ($beratBaru * $hargaPerKg) + $ongkir;
+        } else {
+            $totalHargaBaru = 0; // Tampilkan "Tunggu Ditimbang" di UI ketika belum ditimbang
+        }
         
         $statusBaru = $request->status;
+        if ($request->boolean('validasi_pembayaran') && $pesanan->status == 'menunggu_konfirmasi') {
+            $statusBaru = 'proses';
+        }
 
         // 🔥 MAGIC: Kalau admin input berat (>0) dan sebelumnya beratnya 0, status OTOMATIS jadi menunggu_bayar!
-        if ($beratBaru > 0 && $pesanan->berat == 0) {
-            $statusBaru = 'menunggu_bayar';
+        if ($beratBaru > 0 && $pesanan->status == 'menunggu_timbang') {
+                    $statusBaru = 'menunggu_bayar';
         }
 
         $pesanan->update([
@@ -175,6 +201,19 @@ class PesananController extends Controller
         return view('kurir.dashboard', compact('tugas_kurir', 'riwayat_tugas'));
     }
 
+    public function kurirHistory()
+    {
+        $kurirId = Auth::guard('kurir')->id();
+
+        $riwayat_tugas = Pesanan::where('id_kurir', $kurirId)
+            ->where('status', 'selesai')
+            ->with('pelanggan')
+            ->latest()
+            ->get();
+
+        return view('kurir.history', compact('riwayat_tugas'));
+    }
+
     public function kurirSelesaikanTugas($id)
     {
         $pesanan = \App\Models\Pesanan::findOrFail($id);
@@ -182,7 +221,7 @@ class PesananController extends Controller
         // Logika perubahan status otomatis
         if ($pesanan->status == 'menunggu_pickup') {
             $pesanan->status = 'menunggu_timbang'; // Beres jemput, baju sampai di toko buat ditimbang
-            $pesan_sukses = 'Baju berhasil dijemput! Serahkan ke admin buat ditimbang ege.';
+            $pesan_sukses = 'Baju berhasil dijemput! Serahkan ke admin buat ditimbang.';
         } elseif ($pesanan->status == 'delivery') {
             $pesanan->status = 'selesai'; // Beres antar ke pelanggan
             $pesan_sukses = 'Tugas antar selesai! Cuan mengalir wkwk.';

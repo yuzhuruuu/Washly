@@ -16,6 +16,7 @@ class PembayaranController extends Controller
     {
         $request->validate([
             'id_pesanan' => 'required',
+            'metode_pembayaran' => 'required|in:transfer_bank,ewalet_qris',
             'bukti_bayar' => 'required|image|mimes:jpg,png,jpeg|max:2048', // Max 2MB
         ]);
 
@@ -23,13 +24,17 @@ class PembayaranController extends Controller
 
             \App\Models\Pembayaran::create([
                 'id_pesanan' => $request->id_pesanan,
+                'metode_pembayaran' => $request->metode_pembayaran,
                 'bukti_bayar' => $path,
                 'status_pembayaran' => 'validasi'
             ]);
 
-            // Update status pesanan jadi menunggu konfirmasi admin
+            // Update status pesanan jadi menunggu konfirmasi admin dan simpan path bukti di tabel pesanan juga
             \App\Models\Pesanan::where('id_pesanan', $request->id_pesanan)
-                            ->update(['status' => 'menunggu_konfirmasi']);
+                            ->update([
+                                'status' => 'menunggu_konfirmasi',
+                                'bukti_bayar' => $path
+                            ]);
 
             return back()->with('success', 'Bukti bayar berhasil diunggah! Tunggu admin cek ya.');
     }

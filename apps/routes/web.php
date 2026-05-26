@@ -40,7 +40,7 @@ Route::get('/pesanan/status', function () { return view('pelanggan.status-pesana
 Route::get('/profil', function () { return view('pelanggan.profil'); });
 Route::get('/riwayat', function () { return view('pelanggan.riwayat'); });
 
-// --- FE Admin (Dikemas pakai Prefix biar rapi) ---
+// --- FE Admin ---
 Route::prefix('dashboard/admin')->group(function () {
     Route::get('/', function () { return view('admin.dashboard'); });
     Route::get('/pesanan', function () { return view('admin.kelola-pesanan'); });
@@ -51,7 +51,7 @@ Route::prefix('dashboard/admin')->group(function () {
     Route::get('/pengaturan', function () { return view('admin.pengaturan'); });
 });
 
-// --- FE Kurir (Dikemas pakai Prefix biar rapi) ---
+// --- FE Kurir ---
 Route::prefix('dashboard/kurir')->group(function () {
     Route::get('/', function () { return view('kurir.dashboard'); });
     Route::get('/profil', function () { return view('kurir.profil'); });
@@ -84,13 +84,14 @@ Route::middleware(['auth:pelanggan'])->group(function () {
 // 4. BACKEND ROUTES - ADMIN
 // ==========================================
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
-    // Route::get('/dashboard', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
+    Route::get('/dashboard', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
 
-    // Manajemen Pesanan
+    // Manajemen Pesanan & Layanan (Update dari Temenmu)
     Route::patch('/pesanan/{id}/timbang', [PesananController::class, 'inputTimbangan'])->name('pesanan.updateTimbangan');
     Route::patch('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
     Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
     Route::post('/pesanan/manual', [PesananController::class, 'storeManual'])->name('pesanan.storeManual');
+    Route::patch('/layanan/{id}/update', [AdminController::class, 'updateLayanan'])->name('admin.layanan.update');
 
     // Konfirmasi Bayar & Kurir
     Route::patch('/pembayaran/{id}/konfirmasi', [PembayaranController::class, 'konfirmasi'])->name('pembayaran.konfirmasi');
@@ -102,7 +103,16 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
 // 5. BACKEND ROUTES - KURIR
 // ==========================================
 Route::middleware(['auth:kurir'])->prefix('kurir')->group(function () {
+    // Dashboard & History (Update dari Temenmu)
     Route::get('/dashboard', [PesananController::class, 'kurirIndex'])->name('kurir.dashboard');
+    Route::get('/history', [PesananController::class, 'kurirHistory'])->name('kurir.history');
+    
+    // Profile & Settings Kurir (Update dari Temenmu)
+    Route::get('/profile', [ProfileController::class, 'editKurirProfile'])->name('kurir.profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'updateKurirProfile'])->name('kurir.profile.update');
+    Route::get('/settings', [ProfileController::class, 'editKurirSettings'])->name('kurir.settings.edit');
+    Route::patch('/settings', [ProfileController::class, 'updateKurirSettings'])->name('kurir.settings.update');
+    Route::put('/settings/password', [PasswordController::class, 'update'])->name('kurir.settings.password.update');
     
     // Penyelesaian Tugas
     Route::post('/tugas/{id}/selesaikan', [PesananController::class, 'kurirSelesaikanTugas'])->name('kurir.tugas.selesai');
