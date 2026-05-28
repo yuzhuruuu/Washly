@@ -23,22 +23,22 @@
             </div>
             <div>
                 <h3 class="font-bold text-sm text-[#0074A6] leading-tight">{{ Auth::guard('kurir')->user()?->nama ?? 'Budi Kurir' }}</h3>
-                <p class="text-[10px] text-gray-500 font-medium mt-0.5">Petugas Kurir</p>
+                <p class="text-[10px] text-gray-500 font-medium mt-0.5">Kurir Washly</p>
             </div>
         </div>
 
         {{-- Menu Navigasi --}}
         <nav class="flex-1 px-4 space-y-2">
-            <a href="{{ url('/dashboard/kurir') }}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-[#0074A6] rounded-xl font-bold text-sm transition shadow-sm border border-blue-100">
+            <a href="{{ route('kurir.dashboard') }}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-[#0074A6] rounded-xl font-bold text-sm transition shadow-sm border border-blue-100">
                 <i class="fas fa-th-large w-5 text-center"></i> Daftar Tugas
             </a>
-            <a href="{{ url('/dashboard/kurir/profil') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('kurir.profil') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="far fa-user w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Profil
             </a>
-            <a href="{{ url('/dashboard/kurir/riwayat') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('kurir.riwayat') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-history w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Riwayat Tugas
             </a>
-            <a href="{{ url('/dashboard/kurir/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('kurir.pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-cog w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Pengaturan
             </a>
         </nav>

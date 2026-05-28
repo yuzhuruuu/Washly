@@ -19,17 +19,16 @@
             </div>
 
             <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
-                <a href="{{ url('/dashboard/pelanggan') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
-                <a href="#" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Layanan</a>
-                <a href="#" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
-                <a href="#" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
+                <a href="{{ route('pelanggan.dashboard') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
+                <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Layanan</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
             </div>
 
             <div class="flex items-center space-x-5">
-                <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Justin' }}!</span>
+               <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
                 <button class="text-[#0074A6] hover:text-blue-800"><i class="far fa-bell text-lg"></i></button>
                 <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner">
-                    <img src="https://ui-avatars.com/api/?name=Justin&background=0074A6&color=fff" alt="Avatar" class="w-full h-full object-cover">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
                 </div>
             </div>
         </div>

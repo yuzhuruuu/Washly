@@ -43,9 +43,17 @@
             </a>
             
             {{-- MENU PENGATURAN (Aktif) --}}
-            <a href="{{ url('/dashboard/admin/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition" style="background-color: #EFF6FF; color: #1D5D8A;">
+            <a href="{{ url('/dashboard/admin/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition mb-1" style="background-color: #EFF6FF; color: #1D5D8A;">
                 <i class="fas fa-cog w-5 text-center"></i> Pengaturan
             </a>
+
+            {{-- REVISI: MENAMBAHKAN FORM TOMBOL LOG OUT DI SIDEBAR NAVIGASI --}}
+            <form action="{{ route('logout') }}" method="POST" class="block w-full">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-medium text-sm transition group cursor-pointer">
+                    <i class="fas fa-sign-out-alt w-5 text-center text-red-400 group-hover:text-red-600 transition"></i> Keluar Akun
+                </button>
+            </form>
         </nav>
 
         <div class="p-5 mt-auto">
@@ -66,7 +74,7 @@
             {{-- Header --}}
             <div class="mb-8">
                 <h1 class="text-3xl font-black text-gray-800 mb-2">Pengaturan</h1>
-                <p class="text-sm text-gray-500 font-medium">Kelola informasi admin, profil toko, dan tarif layanan Washly Anda.</p>
+                <p class="text-sm text-gray-500 font-medium">Kelola informasi admin, profil toko, and tarif layanan Washly Anda.</p>
             </div>
 
             <form action="#" method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -98,7 +106,7 @@
                         </div>
                     </div>
 
-                    {{-- Card 2: Profil Toko (Beneran Rapi & Align Tengah Sekarang!) --}}
+                    {{-- Card 2: Profil Toko --}}
                     <div class="bg-white p-7 rounded-3xl border border-gray-100 shadow-sm">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Profil Toko</h2>
                         
@@ -193,7 +201,7 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Simpan (Selalu di bawah ngikut desain) --}}
+                        {{-- Tombol Simpan --}}
                         <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                             <i class="fas fa-save"></i> Simpan
                         </button>

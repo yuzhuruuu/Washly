@@ -16,88 +16,98 @@ class PesananController extends Controller
     
     public function adminIndex()
     {
-        $hariIni = now()->format('Y-m-d');
+        // Hitung statistik untuk 4 kotak di atas
+        $pesananHariIni = \App\Models\Pesanan::whereDate('created_at', \Carbon\Carbon::today())->count();
+        
+        $sedangDiproses = \App\Models\Pesanan::whereIn('status', ['Sedang Diproses', 'Proses Cuci', 'Diambil Kurir'])->count();
+        
+        $selesaiHariIni = \App\Models\Pesanan::where('status', 'Selesai')
+                                            ->whereDate('updated_at', \Carbon\Carbon::today())
+                                            ->count();
+                                            
+        // Menggunakan kolom 'status'
+        $menungguBayar  = \App\Models\Pesanan::where('status', 'Menunggu Pembayaran')->count();
 
-        $stats = [
-            'pesanan_baru' => Pesanan::whereDate('created_at', $hariIni)->count(),
-            'total_pendapatan' => Pesanan::whereDate('created_at', $hariIni)->sum('total_harga'),
-            'kurir_aktif' => Kurir::count(),
-            'perlu_diproses' => Pesanan::whereIn('status', ['menunggu_pickup', 'menunggu_timbang'])->count(),
-        ];
-
-        // REVISI: Eager Loading 'kurir', 'pelanggan', dan 'pembayaran' biar bukti bayar bisa ditampilkan
-        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->latest()->get();
-        $pesanan_terbaru = $semua_pesanan->take(5);
-        $jumlah_pesanan = $semua_pesanan->count();
-        $total_pendapatan_semua = $semua_pesanan->sum('total_harga');
-        $rata_rata_berat = round($semua_pesanan->where('berat', '>', 0)->avg('berat') ?? 0, 2);
-
-        // REVISI: Admin butuh liat semua kurir (termasuk yang sibuk) buat ditugaskan
-        $daftar_kurir = Kurir::all();
-        $daftar_layanan = Layanan::all();
-        $daftar_pembayaran = \App\Models\Pembayaran::with(['pesanan.pelanggan'])->latest()->get();
-
-        $admin = auth('admin')->user();
-        $toko_profil = [
-            'nama' => 'Washly Laundry',
-            'alamat' => 'Jl. Melati No. 12, Bandung',
-            'jam_operasional' => 'Senin - Sabtu, 08:00 - 20:00',
-        ];
+        // Ambil 5 pesanan terbaru untuk tabel di bawah
+        $pesananTerbaru = \App\Models\Pesanan::with(['pelanggan', 'layanan'])
+                                            ->latest('created_at')
+                                            ->take(5)
+                                            ->get();
 
         return view('admin.dashboard', compact(
-            'stats',
-            'semua_pesanan',
-            'pesanan_terbaru',
-            'jumlah_pesanan',
-            'total_pendapatan_semua',
-            'rata_rata_berat',
-            'daftar_kurir',
-            'daftar_layanan',
-            'daftar_pembayaran',
-            'admin',
-            'toko_profil'
+            'pesananHariIni', 
+            'sedangDiproses', 
+            'selesaiHariIni', 
+            'menungguBayar', 
+            'pesananTerbaru'
         ));
     }
 
-    // --- 1. Fungsi Update Admin Pintar ---
-    public function adminUpdatePesanan(Request $request, $id)
+    public function adminRiwayat(\Illuminate\Http\Request $request)
+    {
+        // 1. Mengambil riwayat khusus yang sudah Selesai atau Dibatalkan/Batal
+        $query = \App\Models\Pesanan::with(['pelanggan', 'layanan'])
+                  ->whereIn('status', ['Selesai', 'Batal', 'Dibatalkan']);
+                  
+        // 2. Logika Search bar
+        if ($request->filled('cari')) {
+            $cari = $request->cari;
+            $query->whereHas('pelanggan', function($q) use ($cari) {
+                $q->where('nama', 'like', "%{$cari}%");
+            })->orWhere('id_pesanan', 'like', "%{$cari}%");
+        }
+
+        // 3. Eksekusi paginasi
+        $riwayatPesanan = $query->latest('updated_at')->paginate(5); 
+
+        // 4. Kalkulasi untuk 3 Card Statistik di Atas
+        $totalPesanan = \App\Models\Pesanan::where('status', 'Selesai')->count();
+        $totalPendapatan = \App\Models\Pesanan::where('status', 'Selesai')->sum('total_harga');
+        $rataBerat = \App\Models\Pesanan::where('status', 'Selesai')->avg('berat');
+
+        return view('admin.riwayat', compact(
+            'riwayatPesanan', 
+            'totalPesanan', 
+            'totalPendapatan', 
+            'rataBerat'
+        ));
+    }
+
+    public function kelolaPesanan()
+    {
+        $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir'])->latest()->get();
+        $daftar_kurir = Kurir::all();
+        
+        return view('admin.kelola-pesanan', compact('semua_pesanan', 'daftar_kurir'));
+    }
+
+public function adminUpdatePesanan(Request $request, $id)
     {
         $pesanan = \App\Models\Pesanan::findOrFail($id);
         
+        // 🔥 JALUR KONFIRMASI PEMBAYARAN
+        if ($request->has('status_pembayaran')) {
+            $statusBaru = ($request->status_pembayaran == 'Lunas') ? 'Sedang Diproses' : 'Menunggu Pembayaran';
+            
+            $pesanan->update(['status' => $statusBaru]);
+            
+            return back()->with('success', 'Status pesanan berhasil diupdate ke: ' . $statusBaru);
+        }
+
+        // 🔥 JALUR KELOLA PESANAN MANUAL
         $request->validate([
-            'id_kurir' => 'nullable|exists:kurirs,id_kurir',
-            'status' => 'required',
-            'berat' => 'nullable|numeric|min:0',
-            'validasi_pembayaran' => 'nullable|boolean',
+            'id_kurir' => 'nullable',
+            'status' => 'nullable',
+            'berat' => 'nullable|numeric',
         ]);
-
-        $hargaPerKg = $pesanan->layanan->harga_per_kg ?? 0;
-        $beratBaru = $request->berat ?? $pesanan->berat;
-        $ongkir = 5000; // Ongkir tetap untuk jemput & antar di wilayah sekitar
-        if ($beratBaru > 0) {
-            $totalHargaBaru = ($beratBaru * $hargaPerKg) + $ongkir;
-        } else {
-            $totalHargaBaru = 0; // Tampilkan "Tunggu Ditimbang" di UI ketika belum ditimbang
-        }
-        
-        $statusBaru = $request->status;
-        if ($request->boolean('validasi_pembayaran') && $pesanan->status == 'menunggu_konfirmasi') {
-            $statusBaru = 'proses';
-        }
-
-        // 🔥 MAGIC: Kalau admin input berat (>0) dan sebelumnya beratnya 0, status OTOMATIS jadi menunggu_bayar!
-        if ($beratBaru > 0 && $pesanan->status == 'menunggu_timbang') {
-                    $statusBaru = 'menunggu_bayar';
-        }
 
         $pesanan->update([
-            'id_kurir' => $request->id_kurir,
-            'berat' => $beratBaru,
-            'total_harga' => $totalHargaBaru,
-            'status' => $statusBaru,
+            'id_kurir' => $request->id_kurir ?? $pesanan->id_kurir,
+            'berat' => $request->berat ?? $pesanan->berat,
+            'status' => $request->status ?? $pesanan->status,
         ]);
 
-        return back()->with('success', 'Update berhasil! Status sekarang: ' . $statusBaru);
+        return back()->with('success', 'Update berhasil!');
     }
 
     public function storeManual(Request $request)
@@ -110,7 +120,7 @@ class PesananController extends Controller
         Pesanan::create([
             'id_pelanggan' => $request->id_pelanggan,
             'id_layanan' => $request->id_layanan,
-            'status' => 'menunggu_pickup', // Alur awal
+            'status' => 'menunggu_pickup',
             'berat' => 0,
             'total_harga' => 0,
             'tanggal_pesan' => now(),
@@ -119,19 +129,59 @@ class PesananController extends Controller
         return back()->with('success', 'Pesanan offline berhasil dibuat!');
     }
 
+public function adminPembayaran()
+    {
+        $pesananList = \App\Models\Pesanan::with(['pelanggan'])
+                                        ->whereNotNull('bukti_bayar')
+                                        ->latest('updated_at')
+                                        ->get();
+
+        // 🔥 LOGIKA FILTER ALPINE (Disamakan dengan status database aslimu)
+        $pesananList->map(function($pesanan) {
+            $s = strtolower($pesanan->status);
+            
+            if (strpos($s, 'proses') !== false || strpos($s, 'selesai') !== false) {
+                $pesanan->status_pembayaran = 'dikonfirmasi';
+            } elseif (strpos($s, 'batal') !== false) {
+                $pesanan->status_pembayaran = 'ditolak';
+            } else {
+                $pesanan->status_pembayaran = 'belum';
+            }
+            return $pesanan;
+        });
+
+        return view('admin.pembayaran', compact('pesananList'));
+    }
+
     // ==========================================
     // AREA PELANGGAN
     // ==========================================
 
     public function pelangganIndex()
     {
-        $layanan = Layanan::all();
-        $pesanan_saya = Pesanan::where('id_pelanggan', auth('pelanggan')->id())
+        $daftar_layanan = Layanan::all();
+        $semua_pesanan = Pesanan::where('id_pelanggan', auth('pelanggan')->id())
                         ->with(['layanan', 'kurir'])
                         ->latest()
                         ->get();
 
-        return view('dashboard', compact('layanan', 'pesanan_saya'));
+        return view('pelanggan.dashboard', compact('daftar_layanan', 'semua_pesanan'));
+    }
+
+    public function createPesanan()
+    {
+        $daftar_layanan = Layanan::all();
+        return view('pelanggan.pesanan-baru', compact('daftar_layanan'));
+    }
+
+    public function pelangganRiwayat()
+    {
+        $semua_pesanan = Pesanan::where('id_pelanggan', auth('pelanggan')->id())
+                        ->with(['layanan', 'kurir'])
+                        ->latest()
+                        ->get();
+
+        return view('pelanggan.riwayat', compact('semua_pesanan'));
     }
 
     public function store(Request $request)
@@ -150,23 +200,21 @@ class PesananController extends Controller
             'tanggal_pesan' => now(),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Pesanan dibuat! Kurir akan segera meluncur.');
+        return redirect()->route('pelanggan.dashboard')->with('success', 'Pesanan dibuat! Kurir akan segera meluncur.');
     }
 
     public function uploadPembayaran(Request $request, $id)
     {
         $request->validate([
-            'bukti_bayar' => 'required|image|mimes:jpg,png,jpeg|max:2048', // Max 2MB ege
+            'bukti_bayar' => 'required|image|mimes:jpg,png,jpeg|max:2048', 
         ]);
 
         $pesanan = Pesanan::findOrFail($id);
 
         if ($request->hasFile('bukti_bayar')) {
-            // Simpan file ke folder storage/app/public/bukti_bayar
             $file = $request->file('bukti_bayar');
             $path = $file->store('bukti_bayar', 'public');
 
-            // Update database
             $pesanan->update([
                 'bukti_bayar' => $path,
                 'status' => 'menunggu_konfirmasi' 
@@ -184,7 +232,6 @@ class PesananController extends Controller
     {
         $kurirId = Auth::guard('kurir')->id();
 
-        // REVISI: Gabungkan query biar gak dobel
         $tugas_kurir = Pesanan::where('id_kurir', $kurirId)
             ->whereIn('status', ['menunggu_pickup', 'delivery']) 
             ->with('pelanggan')
@@ -201,7 +248,7 @@ class PesananController extends Controller
         return view('kurir.dashboard', compact('tugas_kurir', 'riwayat_tugas'));
     }
 
-    public function kurirHistory()
+    public function kurirRiwayat()
     {
         $kurirId = Auth::guard('kurir')->id();
 
@@ -211,19 +258,18 @@ class PesananController extends Controller
             ->latest()
             ->get();
 
-        return view('kurir.history', compact('riwayat_tugas'));
+        return view('kurir.riwayat', compact('riwayat_tugas'));
     }
 
     public function kurirSelesaikanTugas($id)
     {
         $pesanan = \App\Models\Pesanan::findOrFail($id);
         
-        // Logika perubahan status otomatis
         if ($pesanan->status == 'menunggu_pickup') {
-            $pesanan->status = 'menunggu_timbang'; // Beres jemput, baju sampai di toko buat ditimbang
+            $pesanan->status = 'menunggu_timbang'; 
             $pesan_sukses = 'Baju berhasil dijemput! Serahkan ke admin buat ditimbang.';
         } elseif ($pesanan->status == 'delivery') {
-            $pesanan->status = 'selesai'; // Beres antar ke pelanggan
+            $pesanan->status = 'selesai'; 
             $pesan_sukses = 'Tugas antar selesai! Cuan mengalir wkwk.';
         } else {
             return back()->with('error', 'Status pesanan nggak valid buat diselesaikan kurir.');
@@ -232,5 +278,57 @@ class PesananController extends Controller
         $pesanan->save();
 
         return redirect()->route('kurir.dashboard')->with('success', $pesan_sukses);
+    }
+
+    public function kurirProfil()
+    {
+        $kurirId = Auth::guard('kurir')->id();
+
+        $riwayat_tugas = Pesanan::where('id_kurir', $kurirId)
+            ->where('status', 'selesai')
+            ->get();
+
+        return view('kurir.profil', compact('riwayat_tugas'));
+    }
+    
+    public function kurirPengaturan()
+    {
+        return view('kurir.pengaturan');
+    }
+
+    public function kurirUpdatePengaturan(\Illuminate\Http\Request $request)
+    {
+        $kurir = \App\Models\Kurir::find(\Illuminate\Support\Facades\Auth::guard('kurir')->id());
+
+        // 1. Jika memicu form ganti kata sandi
+        if ($request->has('password_action')) {
+            $request->validate([
+                'password_baru' => 'required|min:6',
+            ]);
+            $kurir->password = \Illuminate\Support\Facades\Hash::make($request->password_baru);
+            $kurir->save();
+
+            \Illuminate\Support\Facades\Auth::guard('kurir')->login($kurir);
+            return redirect()->route('kurir.pengaturan')->with('success', 'Kata sandi berhasil diperbarui!');
+        }
+
+        // 2. Jika memicu form preferensi notifikasi (toggles)
+        if ($request->has('notification_action')) {
+            $kurir->notif_tugas = $request->has('notif_tugas') ? 1 : 0;
+            $kurir->notif_pesan = $request->has('notif_pesan') ? 1 : 0;
+            $kurir->notif_promo = $request->has('notif_promo') ? 1 : 0;
+            $kurir->save();
+
+            \Illuminate\Support\Facades\Auth::guard('kurir')->login($kurir);
+            return redirect()->route('kurir.pengaturan')->with('success', 'Preferensi notifikasi berhasil diperbarui!');
+        }
+
+        // 3. Jika memicu form informasi profil biasa
+        $kurir->nama = $request->nama;
+        $kurir->no_hp = $request->no_hp;
+        $kurir->save();
+
+        \Illuminate\Support\Facades\Auth::guard('kurir')->login($kurir);
+        return redirect()->route('kurir.pengaturan')->with('success', 'Informasi profil berhasil diperbarui!');
     }
 }

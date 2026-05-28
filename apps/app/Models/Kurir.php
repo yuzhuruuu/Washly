@@ -14,7 +14,7 @@ class Kurir extends Authenticatable
     protected $primaryKey = 'id_kurir';
 
     protected $fillable = [
-        'nama', 'username', 'password', 'no_hp', 'status', 'notify_new_task',
+        'nama', 'username', 'password', 'no_hp', 'status', 'notify_new_task', 'notif_tugas', 'notif_pesan', 'notif_promo'
     ];
 
     protected $hidden = [

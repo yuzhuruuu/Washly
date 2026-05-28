@@ -21,18 +21,23 @@
     <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center relative">
             <div class="flex items-center"><img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8"></div>
+            
+            {{-- LINK NAVIGASI --}}
             <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
-                <a href="{{ url('/dashboard/pelanggan') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
-                <a href="{{ url('/layanan/pesan') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
+                <a href="{{ route('pelanggan.dashboard') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
+                <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
                 {{-- Tab Riwayat Aktif --}}
-                <a href="#" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Riwayat</a>
-                <a href="#" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Riwayat</a>
             </div>
+            
+            {{-- MENU KANAN & PROFIL --}}
             <div class="flex items-center space-x-5">
                 <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></button>
                 <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></button>
+                
+                {{-- AVATAR DINAMIS (Bukan Justin Bieber lagi wkwk) --}}
                 <div class="w-8 h-8 rounded-full border border-gray-200 overflow-hidden shadow-sm">
-                    <img src="https://ui-avatars.com/api/?name=Justin+Bieber&background=0074A6&color=fff" alt="Profile" class="w-full h-full object-cover">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Profile" class="w-full h-full object-cover">
                 </div>
             </div>
         </div>
@@ -41,7 +46,7 @@
     {{-- MAIN CONTENT (Dengan Alpine.js untuk Filter Tabs) --}}
     <main class="max-w-6xl mx-auto px-6 pt-12 relative z-10" x-data="{ activeTab: 'semua' }">
         
-        {{-- Header Title --}}
+        {{-- Header Title }}
         <div class="mb-8">
             <h1 class="text-3xl font-black text-gray-800 mb-2">Riwayat Pesanan</h1>
             <p class="text-gray-500 text-sm">Lacak semua cucian bersihmu di sini.</p>

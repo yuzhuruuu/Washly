@@ -30,9 +30,18 @@ class AdminController extends Controller
         return view('admin.kelola-pesanan', compact('stats', 'semua_pesanan', 'pesanan_terbaru', 'daftar_kurir', 'daftar_layanan'));
     }
 
+    // 🔥 INI FUNGSI YANG BIKIN ERROR TADI (Udah aku tambahin) 🔥
+    public function indexKurir()
+    {
+        // Ambil semua data kurir dari database urut dari yang terbaru
+        $daftar_kurir = Kurir::latest()->get();
+        
+        // Tampilkan ke halaman admin.kurir
+        return view('admin.kurir', compact('daftar_kurir'));
+    }
+
     public function storeKurir(Request $request)
     {
-        
         $request->validate([
             'nama' => 'required|string|max:255',
             'no_hp' => 'required|string|max:15',
