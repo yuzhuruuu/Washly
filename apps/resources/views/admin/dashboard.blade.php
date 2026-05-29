@@ -56,15 +56,15 @@
         </nav>
 
         {{-- Tombol Tambah Layanan (Bawah) --}}
-        <div class="p-5">
-            <button class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+        <div class="p-5 mt-auto">
+            <button @click="$dispatch('buka-modal-layanan')" class="w-full text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                 <i class="fas fa-plus"></i> Tambah Layanan
             </button>
         </div>
     </aside>
 
     {{-- KONTEN UTAMA (Kanan) --}}
-    <main class="flex-1 h-full overflow-y-auto relative z-10">
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -222,6 +222,50 @@
                 </div>
             </div>
 
+        </div>
+    
+        {{-- KODE MODAL POP-UP TAMBAH LAYANAN --}}
+        <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
+                
+                {{-- Tombol Close X --}}
+                <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
+
+                {{-- Form Kirim Data ke Controller --}}
+                <form action="{{ route('admin.layanan.store') }}" method="POST">
+                    @csrf
+                    
+                    <div class="space-y-5">
+                        {{-- Input Nama Layanan --}}
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <i class="fas fa-tag text-gray-400 mr-3"></i>
+                                <input type="text" name="nama_layanan" placeholder="Misal: Cuci Karpet" required class="bg-transparent border-none w-full text-sm font-semibold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+
+                        {{-- Input Harga per KG --}}
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
+                                <input type="number" name="harga_per_kg" placeholder="15000" required class="bg-transparent border-none w-full text-sm font-bold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Layanan Baru
+                    </button>
+                </form>
+
+            </div>
         </div>
     </main>
 

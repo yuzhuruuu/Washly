@@ -16,40 +16,24 @@ class PesananController extends Controller
     
     public function adminIndex()
     {
-        // Hitung statistik untuk 4 kotak di atas
         $pesananHariIni = \App\Models\Pesanan::whereDate('created_at', \Carbon\Carbon::today())->count();
-        
         $sedangDiproses = \App\Models\Pesanan::whereIn('status', ['Sedang Diproses', 'Proses Cuci', 'Diambil Kurir'])->count();
-        
-        $selesaiHariIni = \App\Models\Pesanan::where('status', 'Selesai')
-                                            ->whereDate('updated_at', \Carbon\Carbon::today())
-                                            ->count();
-                                            
-        // Menggunakan kolom 'status'
+        $selesaiHariIni = \App\Models\Pesanan::where('status', 'Selesai')->whereDate('updated_at', \Carbon\Carbon::today())->count();
         $menungguBayar  = \App\Models\Pesanan::where('status', 'Menunggu Pembayaran')->count();
 
-        // Ambil 5 pesanan terbaru untuk tabel di bawah
         $pesananTerbaru = \App\Models\Pesanan::with(['pelanggan', 'layanan'])
                                             ->latest('created_at')
                                             ->take(5)
                                             ->get();
 
-        return view('admin.dashboard', compact(
-            'pesananHariIni', 
-            'sedangDiproses', 
-            'selesaiHariIni', 
-            'menungguBayar', 
-            'pesananTerbaru'
-        ));
+        return view('admin.dashboard', compact('pesananHariIni', 'sedangDiproses', 'selesaiHariIni', 'menungguBayar', 'pesananTerbaru'));
     }
 
     public function adminRiwayat(\Illuminate\Http\Request $request)
     {
-        // 1. Mengambil riwayat khusus yang sudah Selesai atau Dibatalkan/Batal
         $query = \App\Models\Pesanan::with(['pelanggan', 'layanan'])
                   ->whereIn('status', ['Selesai', 'Batal', 'Dibatalkan']);
                   
-        // 2. Logika Search bar
         if ($request->filled('cari')) {
             $cari = $request->cari;
             $query->whereHas('pelanggan', function($q) use ($cari) {
@@ -57,20 +41,13 @@ class PesananController extends Controller
             })->orWhere('id_pesanan', 'like', "%{$cari}%");
         }
 
-        // 3. Eksekusi paginasi
         $riwayatPesanan = $query->latest('updated_at')->paginate(5); 
 
-        // 4. Kalkulasi untuk 3 Card Statistik di Atas
         $totalPesanan = \App\Models\Pesanan::where('status', 'Selesai')->count();
         $totalPendapatan = \App\Models\Pesanan::where('status', 'Selesai')->sum('total_harga');
         $rataBerat = \App\Models\Pesanan::where('status', 'Selesai')->avg('berat');
 
-        return view('admin.riwayat', compact(
-            'riwayatPesanan', 
-            'totalPesanan', 
-            'totalPendapatan', 
-            'rataBerat'
-        ));
+        return view('admin.riwayat', compact('riwayatPesanan', 'totalPesanan', 'totalPendapatan', 'rataBerat'));
     }
 
     public function kelolaPesanan()
@@ -81,11 +58,11 @@ class PesananController extends Controller
         return view('admin.kelola-pesanan', compact('semua_pesanan', 'daftar_kurir'));
     }
 
-public function adminUpdatePesanan(Request $request, $id)
+    public function adminUpdatePesanan(Request $request, $id)
     {
         $pesanan = \App\Models\Pesanan::findOrFail($id);
         
-        // 🔥 JALUR KONFIRMASI PEMBAYARAN
+        // 🔥 JALUR KHUSUS: Mengubah Status Pesanan via Form Konfirmasi Pembayaran
         if ($request->has('status_pembayaran')) {
             $statusBaru = ($request->status_pembayaran == 'Lunas') ? 'Sedang Diproses' : 'Menunggu Pembayaran';
             
@@ -129,20 +106,21 @@ public function adminUpdatePesanan(Request $request, $id)
         return back()->with('success', 'Pesanan offline berhasil dibuat!');
     }
 
-public function adminPembayaran()
+    public function adminPembayaran()
     {
         $pesananList = \App\Models\Pesanan::with(['pelanggan'])
                                         ->whereNotNull('bukti_bayar')
                                         ->latest('updated_at')
                                         ->get();
 
-        // 🔥 LOGIKA FILTER ALPINE (Disamakan dengan status database aslimu)
+        // 🔥 FILTER PINTAR ALPINE.JS: 
+        // Mengubah status asli database menjadi filter tab (dikonfirmasi/ditolak/belum)
         $pesananList->map(function($pesanan) {
             $s = strtolower($pesanan->status);
             
-            if (strpos($s, 'proses') !== false || strpos($s, 'selesai') !== false) {
+            if (strpos($s, 'proses') !== false || strpos($s, 'selesai') !== false || strpos($s, 'delivery') !== false || strpos($s, 'diambil') !== false) {
                 $pesanan->status_pembayaran = 'dikonfirmasi';
-            } elseif (strpos($s, 'batal') !== false) {
+            } elseif (strpos($s, 'batal') !== false || strpos($s, 'tolak') !== false) {
                 $pesanan->status_pembayaran = 'ditolak';
             } else {
                 $pesanan->status_pembayaran = 'belum';
@@ -300,7 +278,6 @@ public function adminPembayaran()
     {
         $kurir = \App\Models\Kurir::find(\Illuminate\Support\Facades\Auth::guard('kurir')->id());
 
-        // 1. Jika memicu form ganti kata sandi
         if ($request->has('password_action')) {
             $request->validate([
                 'password_baru' => 'required|min:6',
@@ -312,7 +289,6 @@ public function adminPembayaran()
             return redirect()->route('kurir.pengaturan')->with('success', 'Kata sandi berhasil diperbarui!');
         }
 
-        // 2. Jika memicu form preferensi notifikasi (toggles)
         if ($request->has('notification_action')) {
             $kurir->notif_tugas = $request->has('notif_tugas') ? 1 : 0;
             $kurir->notif_pesan = $request->has('notif_pesan') ? 1 : 0;
@@ -323,7 +299,6 @@ public function adminPembayaran()
             return redirect()->route('kurir.pengaturan')->with('success', 'Preferensi notifikasi berhasil diperbarui!');
         }
 
-        // 3. Jika memicu form informasi profil biasa
         $kurir->nama = $request->nama;
         $kurir->no_hp = $request->no_hp;
         $kurir->save();

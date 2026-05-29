@@ -91,7 +91,7 @@
 
             <div class="space-y-4">
                 
-                @forelse($pesananList ?? [] as $pesanan)
+                    @forelse($pesananList ?? [] as $pesanan)
                     @php
                         $nama = $pesanan->pelanggan->nama ?? 'Unknown';
                         $kata = explode(' ', $nama);
@@ -100,18 +100,22 @@
                         $warna = ['bg-blue-100 text-[#0074A6]', 'bg-cyan-100 text-cyan-600', 'bg-orange-100 text-orange-600', 'bg-indigo-100 text-indigo-500', 'bg-pink-100 text-pink-500'];
                         $warnaPilih = $warna[crc32($nama) % count($warna)];
 
-                        $statusDb = $pesanan->status_pembayaran ?? 'Menunggu Konfirmasi';
-                        $kategoriFilter = 'belum'; 
-                        if (in_array($statusDb, ['Lunas', 'Dikonfirmasi'])) {
-                            $kategoriFilter = 'dikonfirmasi';
-                        } elseif (in_array($statusDb, ['Ditolak', 'Batal'])) {
-                            $kategoriFilter = 'ditolak';
+                        // 🔥 REVISI: Mengambil Kategori Murni dari Controller (gak pake in_array lagi)
+                        $kategoriFilter = $pesanan->status_pembayaran ?? 'belum'; 
+                        
+                        // Menentukan text visual di badge status
+                        if ($kategoriFilter === 'dikonfirmasi') {
+                            $statusLabel = 'Dikonfirmasi';
+                        } elseif ($kategoriFilter === 'ditolak') {
+                            $statusLabel = 'Ditolak';
+                        } else {
+                            $statusLabel = 'Menunggu Konfirmasi';
                         }
 
                         $metode = $pesanan->metode_pembayaran ?? 'Transfer';
                         $iconMetode = (stripos($metode, 'gopay') !== false || stripos($metode, 'ovo') !== false || stripos($metode, 'dana') !== false) ? 'fa-wallet' : 'fa-university';
 
-                        $buktiLink = $pesanan->bukti_bayar ? asset('storage/' . $pesanan->bukti_bayar) : '#';
+                        $buktiLink = $pesanan->bukti_bayar ? asset('storage/' . str_replace('public/', '', $pesanan->bukti_bayar)) : '#';
                     @endphp
 
                     <div x-show="filter === 'semua' || filter === '{{ $kategoriFilter }}'" class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition gap-4">

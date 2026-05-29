@@ -30,8 +30,7 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
 Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () {
     Route::get('/', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
     Route::get('/pesanan', [PesananController::class, 'kelolaPesanan'])->name('admin.pesanan.kelola');
-    Route::get('/pesanan/{id}/detail', function ($id) {
-        $pesanan = \App\Models\Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->findOrFail($id);
+    Route::get('/pesanan/{id}/detail', function ($id) {$pesanan = \App\Models\Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->findOrFail($id);
         return view('admin.detail-pesanan', compact('pesanan')); 
     })->name('admin.pesanan.detail');
     Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
@@ -39,7 +38,9 @@ Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () 
     Route::post('/kurir/store', [AdminController::class, 'storeKurir'])->name('admin.kurir.store');
     Route::get('/pembayaran', [PesananController::class, 'adminPembayaran'])->name('admin.pembayaran');
     Route::get('/riwayat', [PesananController::class, 'adminRiwayat'])->name('admin.riwayat');
-    Route::get('/pengaturan', function () { return view('admin.pengaturan'); })->name('admin.pengaturan');
+    Route::get('/pengaturan', [\App\Http\Controllers\AdminController::class, 'pengaturan'])->name('admin.pengaturan');
+    Route::post('/pengaturan', [\App\Http\Controllers\AdminController::class, 'updatePengaturan'])->name('admin.pengaturan.update');
+    Route::post('/layanan/store', [\App\Http\Controllers\AdminController::class, 'storeLayanan'])->name('admin.layanan.store');
 });
 
 // 4. BACKEND ROUTES - KURIR
