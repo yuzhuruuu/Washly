@@ -51,6 +51,12 @@
             <a href="{{ url('/dashboard/admin/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-cog w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Pengaturan
             </a>
+            <form action="{{ route('logout') }}" method="POST" class="block w-full">
+                @csrf
+                <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-xl font-medium text-sm transition group cursor-pointer">
+                    <i class="fas fa-sign-out-alt w-5 text-center text-red-400 group-hover:text-red-600 transition"></i> Keluar Akun
+                </button>
+            </form>
         </nav>
 
         <div class="p-5 mt-auto">
@@ -274,7 +280,7 @@
                                  <label class="block text-xs font-semibold text-gray-600 mb-2">Username</label>
                                  <div class="relative">
                                      <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                     <input type="text" name="username" value="{{ old('username') }}" placeholder="budi_washly" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
+                                     <input type="text" name="username" value="{{ old('username') }}" placeholder="username_" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                                  </div>
                                  {{-- Error Warning Username Kembar --}}
                                  @error('username')
