@@ -26,10 +26,24 @@
 
             <div class="flex items-center space-x-5">
                <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
+<<<<<<< HEAD
                 <button class="text-[#0074A6] hover:text-blue-800"><i class="far fa-bell text-lg"></i></button>
                 <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
                 </div>
+=======
+                <a href="{{ route('pelanggan.notifikasi') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></a>
+                <a href="{{ route('pelanggan.bantuan') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></a>
+                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner block">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
             </div>
         </div>
     </nav>
@@ -40,24 +54,24 @@
           x-data="{ 
               step: 1, 
               layanan: '', 
+              layananId: null,
               harga: 0, 
               berat: 0, 
-              pilihLayanan(nama, hrg) {
+              alamat: '',
+              pilihLayanan(nama, hrg, id) {
                   this.layanan = nama;
                   this.harga = hrg;
+                  this.layananId = id;
                   if (this.step === 1) {
                       this.step = 2; 
                   }
               },
               lanjutKeKonfirmasi() {
-                  if(this.berat > 0 && this.layanan !== '') {
-                      // 1. Jalanin progress bar ke angka 3
+                  if(this.berat > 0 && this.layanan !== '' && this.alamat.trim() !== '') {
                       this.step = 3; 
-                      
-                      // 2. Tunggu 0.6 detik biar animasinya keliatan, trus otomatis pindah halaman!
                       setTimeout(() => {
-                          window.location.href = '/pembayaran/demo';
-                      }, 600);
+                          this.$refs.orderForm.submit();
+                      }, 300);
                   }
               }
           }">
@@ -131,17 +145,17 @@
 
                     {{-- Button Group Interaktif --}}
                     <div class="flex flex-wrap gap-4 mb-8">
-                        <button @click="pilihLayanan('Cuci Saja', 4000)" 
+                        <button @click="pilihLayanan('Cuci Saja', 7000, 1)" 
                                 :class="layanan === 'Cuci Saja' ? 'border-2 border-[#0074A6] bg-[#E6F3FA] text-[#0074A6] font-bold shadow-md shadow-blue-100' : 'border border-gray-200 text-gray-500 font-medium bg-white hover:border-[#0074A6]'"
                                 class="px-7 py-3 rounded-full text-sm transition-all duration-300">
                             Cuci Saja
                         </button>
-                        <button @click="pilihLayanan('Setrika Saja', 4000)" 
+                        <button @click="pilihLayanan('Setrika Saja', 6000, 2)" 
                                 :class="layanan === 'Setrika Saja' ? 'border-2 border-[#0074A6] bg-[#E6F3FA] text-[#0074A6] font-bold shadow-md shadow-blue-100' : 'border border-gray-200 text-gray-500 font-medium bg-white hover:border-[#0074A6]'"
                                 class="px-7 py-3 rounded-full text-sm transition-all duration-300">
                             Setrika Saja
                         </button>
-                        <button @click="pilihLayanan('Cuci + Setrika', 6000)" 
+                        <button @click="pilihLayanan('Cuci + Setrika', 15000, 3)" 
                                 :class="layanan === 'Cuci + Setrika' ? 'border-2 border-[#0074A6] bg-[#E6F3FA] text-[#0074A6] font-bold shadow-md shadow-blue-100' : 'border border-gray-200 text-gray-500 font-medium bg-white hover:border-[#0074A6]'"
                                 class="px-7 py-3 rounded-full text-sm transition-all duration-300">
                             Cuci + Setrika
@@ -161,32 +175,29 @@
                         <h2 class="text-lg font-bold text-[#005B82]">Detail Tambahan</h2>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
-                        
-                        {{-- Input Perkiraan Berat --}}
+                    <div class="grid grid-cols-1 gap-8">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Perkiraan Berat (kg)</label>
-                            {{-- FIX 1: Kasih tinggi pasti h-[52px] --}}
-                            <div class="flex items-center bg-[#F4F7FB] rounded-xl p-1.5 border border-transparent focus-within:border-[#0074A6] transition h-[52px]">
-                                {{-- Tombol Kurang (-) --}}
-                                <button @click="if(berat > 0) berat--" class="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#0074A6] bg-white rounded-lg shadow-sm font-bold text-lg active:scale-95 transition-all">-</button>
-                                
-                                {{-- FIX 2: appearance-none dan hapus spin button bawaan browser --}}
-                                <input type="number" x-model="berat" class="w-full h-full text-center bg-transparent border-none outline-none focus:ring-0 text-xl font-extrabold text-gray-800 shadow-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none m-0" readonly>
-                                
-                                <button @click="berat++" class="w-10 h-full flex items-center justify-center text-[#0074A6] hover:bg-[#0074A6] hover:text-white bg-white rounded-lg shadow-sm font-bold text-lg active:scale-95 transition-all">+</button>
-                            </div>
+                            <label class="block text-sm font-semibold text-gray-800 mb-2">Alamat Pickup</label>
+                            <textarea x-model="alamat" name="alamat" form="orderForm" rows="3" class="w-full rounded-xl border border-gray-200 bg-[#F4F7FB] px-4 py-3 text-sm text-gray-700 focus:border-[#0074A6] focus:ring-2 focus:ring-[#0074A6] focus:outline-none" placeholder="Masukkan alamat lengkap pickup"></textarea>
                         </div>
 
-                        {{-- Input Tanggal Pickup --}}
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Tanggal Pickup</label>
-                            <div class="relative">
-                                {{-- FIX 3 & 1: Hapus value="..." dan kasih tinggi pasti h-[52px] biar sejajar --}}
-                                <input type="date" class="w-full h-[52px] bg-[#F4F7FB] border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-700 font-semibold focus:outline-none">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-800 mb-2">Perkiraan Berat (kg)</label>
+                                <div class="flex items-center bg-[#F4F7FB] rounded-xl p-1.5 border border-transparent focus-within:border-[#0074A6] transition h-[52px]">
+                                    <button @click="if(berat > 0) berat--" type="button" class="w-10 h-full flex items-center justify-center text-gray-500 hover:text-[#0074A6] bg-white rounded-lg shadow-sm font-bold text-lg active:scale-95 transition-all">-</button>
+                                    <input type="number" x-model="berat" class="w-full h-full text-center bg-transparent border-none outline-none focus:ring-0 text-xl font-extrabold text-gray-800 shadow-none appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none m-0" readonly>
+                                    <button @click="berat++" type="button" class="w-10 h-full flex items-center justify-center text-[#0074A6] hover:bg-[#0074A6] hover:text-white bg-white rounded-lg shadow-sm font-bold text-lg active:scale-95 transition-all">+</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-800 mb-2">Tanggal Pickup</label>
+                                <div class="relative">
+                                    <input type="date" class="w-full h-[52px] bg-[#F4F7FB] border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-[#0074A6] text-gray-700 font-semibold focus:outline-none">
+                                </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -194,7 +205,10 @@
 
             {{-- KANAN: RINGKASAN --}}
             <div class="md:col-span-1">
-                <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-blue-900/5 border border-gray-50 sticky top-28 w-full max-w-sm mx-auto md:w-auto">
+                <form x-ref="orderForm" id="orderForm" action="{{ route('pesanan.store') }}" method="POST" class="bg-white rounded-[2rem] p-8 shadow-xl shadow-blue-900/5 border border-gray-50 sticky top-28 w-full max-w-sm mx-auto md:w-auto">
+                    @csrf
+                    <input type="hidden" name="id_layanan" :value="layananId">
+                    <input type="hidden" name="berat" :value="berat">
                     <div class="flex justify-between items-center mb-8 border-b border-gray-100 pb-5">
                         <h2 class="text-xl font-bold text-[#005B82]">Ringkasan</h2>
                         <i class="fas fa-receipt text-[#0074A6] text-xl opacity-80"></i>
@@ -229,9 +243,10 @@
                     
                     {{-- Tombol Lanjutkan (Cuma 1x Klik!) --}}
                     <button @click="lanjutKeKonfirmasi()"
+                            type="button"
                             class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white font-bold py-4 rounded-full transition-all duration-300 shadow-lg shadow-blue-800/20 flex justify-center items-center gap-2.5 active:scale-[0.98]"
-                            :class="(step < 2 || berat === 0) ? 'opacity-50 cursor-not-allowed' : ''"
-                            :disabled="step < 2 || berat === 0 || step === 3">
+                            :class="(step < 2 || berat === 0 || layananId === null || alamat.trim() === '') ? 'opacity-50 cursor-not-allowed' : ''"
+                            :disabled="step < 2 || berat === 0 || layananId === null || alamat.trim() === '' || step === 3">
                         {{-- Teks berubah jadi memproses pas diklik --}}
                         <span x-text="step === 3 ? 'Memproses...' : 'Lanjutkan'">Lanjutkan</span> 
                         <i class="fas fa-arrow-right text-xs" x-show="step < 3"></i>
@@ -242,7 +257,7 @@
                         <span class="flex items-center gap-1.5"><i class="fas fa-shield-alt text-gray-300"></i> Aman</span>
                         <span class="flex items-center gap-1.5"><i class="fas fa-headset text-gray-300"></i> 24/7 Bantuan</span>
                     </div>
-                </div>
+                </form>
             </div>
 
         </div>

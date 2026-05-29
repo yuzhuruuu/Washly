@@ -10,7 +10,7 @@
 <body class="bg-[#F8FAFC] h-screen font-sans text-slate-800 flex overflow-hidden">
 
     {{-- SIDEBAR KONSISTEN --}}
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+    <aside x-data class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
         <div class="p-6">
             <img src="{{ asset('images/w-a.svg') }}" alt="Washly Admin" class="h-8">
         </div>
@@ -60,14 +60,14 @@
         </nav>
 
         <div class="p-5 mt-auto">
-            <button class="w-full text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+            <button @click="$dispatch('buka-modal-layanan')" class="w-full text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                 <i class="fas fa-plus"></i> Tambah Layanan
             </button>
         </div>
     </aside>
 
     {{-- KONTEN UTAMA --}}
-    <main class="flex-1 overflow-y-auto relative z-10">
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ showPasswordFields: false }">
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-cyan-50/50 rounded-full blur-[100px] pointer-events-none z-0"></div>
@@ -93,6 +93,7 @@
                         
                         <h2 class="text-xl font-bold text-gray-800 mb-6 relative z-10">Informasi Admin</h2>
                         
+<<<<<<< HEAD
                         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
                             {{-- Foto Profil Dinamis Bawaan --}}
                             <div class="relative w-24 h-24 shrink-0">
@@ -106,6 +107,48 @@
                             <div class="w-full">
                                 <label class="block text-xs font-semibold text-gray-600 mb-2">Nama Lengkap</label>
                                 <input type="text" name="nama" value="{{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username }}" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+=======
+                        <div class="space-y-5 relative z-10">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                                {{-- Foto Profil Dinamis Bawaan --}}
+                                <div class="relative w-24 h-24 shrink-0">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin') }}&background=1D5D8A&color=fff&size=150" alt="Admin Profile" class="w-full h-full rounded-full object-cover border-4 border-white shadow-sm">
+                                </div>
+
+                                <div class="w-full">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-2">Nama</label>
+                                    <input type="text" name="nama" value="{{ old('nama', Auth::guard('admin')->user()?->nama) }}" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-2">Username</label>
+                                <input type="text" name="username" value="{{ old('username', Auth::guard('admin')->user()?->username) }}" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-2">Email</label>
+                                <input type="email" name="email" value="{{ old('email', Auth::guard('admin')->user()?->email) }}" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                            </div>
+
+                            <div>
+                                <button type="button" @click="showPasswordFields = !showPasswordFields" class="w-full text-left bg-slate-100 hover:bg-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 flex items-center justify-between gap-3 transition">
+                                    <span>Perbarui Password</span>
+                                    <i class="fas" :class="showPasswordFields ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                </button>
+                            </div>
+
+                            <div x-show="showPasswordFields" x-cloak class="space-y-5 overflow-hidden transition-all duration-300">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-2">Password Baru</label>
+                                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin mengganti" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-2">Konfirmasi Password</label>
+                                    <input type="password" name="password_confirmation" placeholder="Ulangi password baru" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                                </div>
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                             </div>
                         </div>
                     </div>
@@ -153,10 +196,15 @@
                 </div>
 
                 {{-- KOLOM KANAN (Tarif & Layanan) --}}
-                <div class="lg:col-span-5 flex flex-col h-full">
+                <div class="lg:col-span-5 flex flex-col">
                     
+<<<<<<< HEAD
 {{-- Card 3: Tarif --}}
                     <div class="bg-slate-100 p-7 rounded-3xl border border-slate-200 shadow-sm flex-1 flex flex-col">
+=======
+                    {{-- Card 3: Tarif --}}
+                    <div class="bg-slate-100 p-7 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                             <i class="fas fa-money-bill-wave text-[#1D5D8A]"></i> Tarif & Layanan
                         </h2>
@@ -164,7 +212,7 @@
                             Sesuaikan harga per kilogram dan biaya pengiriman standar.
                         </p>
 
-                        <div class="space-y-5 flex-1">
+                        <div class="space-y-5">
                             {{-- Tarif Cuci --}}
                             <div>
                                 <label class="block text-[11px] font-bold text-gray-500 mb-2">Tarif Cuci (per kg)</label>
@@ -198,7 +246,11 @@
                                 <div class="flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
                                     <div class="flex items-center flex-1">
                                         <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
+<<<<<<< HEAD
                                         <input type="text" name="tarif_ongkir" value="5000" class="bg-transparent border-none w-full font-bold text-gray-700 text-sm focus:outline-none p-0 m-0">
+=======
+                                        <input type="text" name="tarif_ongkir" value="{{ $tarif_ongkir ?? 5000 }}" class="bg-transparent border-none w-full font-bold text-gray-700 text-sm focus:outline-none p-0 m-0">
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                     </div>
                                     <i class="fas fa-truck text-[#1D5D8A]"></i>
                                 </div>

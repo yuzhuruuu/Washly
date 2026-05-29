@@ -11,7 +11,11 @@
 <body class="bg-[#F8FAFC] h-screen font-sans text-slate-800 flex overflow-hidden">
 
     {{-- SIDEBAR KONSISTEN --}}
+<<<<<<< HEAD
     <aside class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+=======
+    <aside x-data class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
         {{-- Logo --}}
         <div class="p-6">
             <img src="{{ asset('images/w-a.svg') }}" alt="Washly Admin" class="h-8">
@@ -56,15 +60,25 @@
             </form>
         </nav>
 
+<<<<<<< HEAD
+=======
+        {{-- TRIGGER TAMBAH LAYANAN --}}
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
         <div class="p-5 mt-auto">
-            <button class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+            <button @click="$dispatch('buka-modal-layanan')" class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                 <i class="fas fa-plus"></i> Tambah Layanan
             </button>
         </div>
     </aside>
 
+<<<<<<< HEAD
     {{-- KONTEN UTAMA DENGAN TAMBAHAN STATE ALPINE BUAT MODAL --}}
     <main class="flex-1 p-10 overflow-y-auto relative z-10" x-data="{ filter: 'belum', modalOpen: false, imageSrc: '' }">
+=======
+    {{-- KONTEN UTAMA --}}
+    {{-- 🔥 TAMBAH STATE ALPINE.JS --}}
+    <main class="flex-1 p-10 overflow-y-auto relative z-10" x-data="{ filter: 'belum', modalOpen: false, imageSrc: '', modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
         <div class="max-w-5xl mx-auto relative z-10">
@@ -100,10 +114,15 @@
                         $warna = ['bg-blue-100 text-[#0074A6]', 'bg-cyan-100 text-cyan-600', 'bg-orange-100 text-orange-600', 'bg-indigo-100 text-indigo-500', 'bg-pink-100 text-pink-500'];
                         $warnaPilih = $warna[crc32($nama) % count($warna)];
 
+<<<<<<< HEAD
                         // 🔥 REVISI: Mengambil Kategori Murni dari Controller (gak pake in_array lagi)
                         $kategoriFilter = $pesanan->status_pembayaran ?? 'belum'; 
                         
                         // Menentukan text visual di badge status
+=======
+                        $kategoriFilter = $pesanan->status_pembayaran ?? 'belum'; 
+                        
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         if ($kategoriFilter === 'dikonfirmasi') {
                             $statusLabel = 'Dikonfirmasi';
                         } elseif ($kategoriFilter === 'ditolak') {
@@ -141,7 +160,10 @@
                                     </div>
                                 </div>
                                 
+<<<<<<< HEAD
                                 {{-- REVISI: Mengubah tag <a> menjadi <button> pemicu Alpine.js Modal --}}
+=======
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                 <button type="button" @click="modalOpen = true; imageSrc = '{{ $buktiLink }}'" title="Lihat Bukti Transfer" class="w-9 h-9 bg-[#C5E1E1] rounded-lg flex items-center justify-center text-teal-800 cursor-pointer hover:opacity-80 transition shadow-sm shrink-0">
                                     <i class="fas fa-file-invoice text-sm"></i>
                                 </button>
@@ -153,7 +175,10 @@
                             <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan ?? $pesanan->id) }}" method="POST" class="m-0 p-0">
                                 @csrf
                                 @method('PATCH')
+<<<<<<< HEAD
                                 {{-- Pastikan ini status_pembayaran --}}
+=======
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                 <input type="hidden" name="status_pembayaran" value="Lunas"> 
                                 <button type="submit" class="w-full bg-[#0074A6] hover:bg-[#005B82] text-white py-1.5 rounded-full text-[11px] font-bold transition shadow-sm cursor-pointer">Konfirmasi</button>
                             </form>
@@ -161,10 +186,20 @@
                             <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan ?? $pesanan->id) }}" method="POST" class="m-0 p-0">
                                 @csrf
                                 @method('PATCH')
+<<<<<<< HEAD
                                 {{-- Pastikan ini status_pembayaran --}}
                                 <input type="hidden" name="status_pembayaran" value="Ditolak">
                                 <button type="submit" class="w-full bg-red-100 hover:bg-red-200 text-red-600 py-1.5 rounded-full text-[11px] font-bold transition cursor-pointer">Tolak</button>
                             </form>
+=======
+                                <input type="hidden" name="status_pembayaran" value="Ditolak">
+                                <button type="submit" class="w-full bg-red-100 hover:bg-red-200 text-red-600 py-1.5 rounded-full text-[11px] font-bold transition cursor-pointer">Tolak</button>
+                            </form>
+                        @else
+                            <span class="w-full text-center py-1.5 rounded-full text-[11px] font-bold {{ $kategoriFilter === 'dikonfirmasi' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600' }}">
+                                {{ $statusLabel }}
+                            </span>
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         @endif
                         </div>
                     </div>
@@ -181,16 +216,25 @@
 
         </div>
 
+<<<<<<< HEAD
         {{-- ================= MODAL BUKTI PEMBAYARAN ALPINE.JS ================= --}}
         <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
             <div @click.outside="modalOpen = false" class="bg-white p-3 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
                 
                 {{-- Tombol Close --}}
+=======
+        {{-- ================= MODAL BUKTI PEMBAYARAN ================= --}}
+        <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalOpen = false" class="bg-white p-3 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                 <button @click="modalOpen = false" class="absolute -top-3 -right-3 bg-red-100 text-red-600 w-8 h-8 rounded-full shadow-md flex items-center justify-center hover:bg-red-200 transition font-bold">
                     <i class="fas fa-times"></i>
                 </button>
                 
+<<<<<<< HEAD
                 {{-- Area Gambar Bukti --}}
+=======
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                 <div class="rounded-2xl overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center min-h-[300px]">
                     <template x-if="imageSrc !== '#'">
                         <img :src="imageSrc" alt="Bukti Pembayaran" class="w-full h-auto object-contain max-h-[70vh]">
@@ -202,10 +246,54 @@
                         </div>
                     </template>
                 </div>
+<<<<<<< HEAD
 
             </div>
         </div>
         {{-- ================= END MODAL ================= --}}
+=======
+            </div>
+        </div>
+
+        {{-- 🔥 KODE MODAL POP-UP TAMBAH LAYANAN 🔥 --}}
+        <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
+                
+                <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
+
+                <form action="{{ route('admin.layanan.store') }}" method="POST">
+                    @csrf
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <i class="fas fa-tag text-gray-400 mr-3"></i>
+                                <input type="text" name="nama_layanan" placeholder="Misal: Cuci Karpet" required class="bg-transparent border-none w-full text-sm font-semibold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
+                                <input type="number" name="harga_per_kg" placeholder="15000" required class="bg-transparent border-none w-full text-sm font-bold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Layanan Baru
+                    </button>
+                </form>
+
+            </div>
+        </div>
+>>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 
     </main>
 </body>
