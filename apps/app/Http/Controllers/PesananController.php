@@ -29,33 +29,15 @@ class PesananController extends Controller
                                             ->take(5)
                                             ->get();
 
-<<<<<<< HEAD
-        return view('admin.dashboard', compact('pesananHariIni', 'sedangDiproses', 'selesaiHariIni', 'menungguBayar', 'pesananTerbaru'));
-=======
         $daftar_layanan = Layanan::all();
 
         return view('admin.dashboard', compact('pesananHariIni', 'sedangDiproses', 'selesaiHariIni', 'menungguBayar', 'pesananTerbaru', 'daftar_layanan'));
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
     }
 
     public function adminRiwayat(\Illuminate\Http\Request $request)
     {
-<<<<<<< HEAD
-        $query = \App\Models\Pesanan::with(['pelanggan', 'layanan'])
-                  ->whereIn('status', ['Selesai', 'Batal', 'Dibatalkan']);
-                  
-        if ($request->filled('cari')) {
-            $cari = $request->cari;
-            $query->whereHas('pelanggan', function($q) use ($cari) {
-                $q->where('nama', 'like', "%{$cari}%");
-            })->orWhere('id_pesanan', 'like', "%{$cari}%");
-        }
-
-        $riwayatPesanan = $query->latest('updated_at')->paginate(5); 
-=======
         $query = $this->buildAdminRiwayatQuery($request);
         $riwayatPesanan = $query->latest('updated_at')->paginate(5)->withQueryString(); 
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 
         $totalPesanan = \App\Models\Pesanan::where('status', 'Selesai')->count();
         $totalPendapatan = \App\Models\Pesanan::where('status', 'Selesai')->sum('total_harga');
@@ -64,8 +46,6 @@ class PesananController extends Controller
         return view('admin.riwayat', compact('riwayatPesanan', 'totalPesanan', 'totalPendapatan', 'rataBerat'));
     }
 
-<<<<<<< HEAD
-=======
     public function adminRiwayatExport(\Illuminate\Http\Request $request)
     {
         $pesananList = $this->buildAdminRiwayatQuery($request)
@@ -138,7 +118,6 @@ class PesananController extends Controller
         return $query;
     }
 
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
     public function kelolaPesanan()
     {
         $semua_pesanan = Pesanan::with(['pelanggan', 'layanan', 'kurir'])->latest()->get();
@@ -167,13 +146,6 @@ class PesananController extends Controller
             'berat' => 'nullable|numeric',
         ]);
 
-<<<<<<< HEAD
-        $pesanan->update([
-            'id_kurir' => $request->id_kurir ?? $pesanan->id_kurir,
-            'berat' => $request->berat ?? $pesanan->berat,
-            'status' => $request->status ?? $pesanan->status,
-        ]);
-=======
         // Jika berat diubah, rekalkulasi total_harga berdasarkan layanan + ongkir flat
         $updateData = [
             'id_kurir' => $request->id_kurir ?? $pesanan->id_kurir,
@@ -190,7 +162,6 @@ class PesananController extends Controller
         }
 
         $pesanan->update($updateData);
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 
         return back()->with('success', 'Update berhasil!');
     }
@@ -226,49 +197,16 @@ class PesananController extends Controller
         $totalHarga += intval($ongkir);
 
         Pesanan::create([
-<<<<<<< HEAD
-            'id_pelanggan' => $request->id_pelanggan,
-            'id_layanan' => $request->id_layanan,
-            'status' => 'menunggu_pickup',
-            'berat' => 0,
-            'total_harga' => 0,
-=======
             'id_pelanggan' => $pelanggan->id_pelanggan,
             'id_layanan' => $layanan->id_layanan,
             'status' => 'menunggu_pickup',
             'berat' => $request->berat,
             'total_harga' => $totalHarga,
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
             'tanggal_pesan' => now(),
             'catatan' => $request->input('catatan'),
         ]);
 
         return back()->with('success', 'Pesanan manual berhasil dibuat!');
-    }
-
-    public function adminPembayaran()
-    {
-        $pesananList = \App\Models\Pesanan::with(['pelanggan'])
-                                        ->whereNotNull('bukti_bayar')
-                                        ->latest('updated_at')
-                                        ->get();
-
-        // 🔥 FILTER PINTAR ALPINE.JS: 
-        // Mengubah status asli database menjadi filter tab (dikonfirmasi/ditolak/belum)
-        $pesananList->map(function($pesanan) {
-            $s = strtolower($pesanan->status);
-            
-            if (strpos($s, 'proses') !== false || strpos($s, 'selesai') !== false || strpos($s, 'delivery') !== false || strpos($s, 'diambil') !== false) {
-                $pesanan->status_pembayaran = 'dikonfirmasi';
-            } elseif (strpos($s, 'batal') !== false || strpos($s, 'tolak') !== false) {
-                $pesanan->status_pembayaran = 'ditolak';
-            } else {
-                $pesanan->status_pembayaran = 'belum';
-            }
-            return $pesanan;
-        });
-
-        return view('admin.pembayaran', compact('pesananList'));
     }
 
     public function adminPembayaran()
@@ -325,8 +263,6 @@ class PesananController extends Controller
                         ->get();
 
         return view('pelanggan.riwayat', compact('semua_pesanan'));
-<<<<<<< HEAD
-=======
     }
 
     public function pelangganProfil()
@@ -451,7 +387,6 @@ class PesananController extends Controller
         ]);
 
         return redirect()->route('pelanggan.profil')->with('success', 'Profil berhasil diperbarui.');
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
     }
 
     public function store(Request $request)
@@ -556,8 +491,6 @@ class PesananController extends Controller
         return redirect()->route('kurir.dashboard')->with('success', $pesan_sukses);
     }
 
-<<<<<<< HEAD
-=======
     private function getTarifOngkir()
     {
         $path = storage_path('app/settings.json');
@@ -570,7 +503,6 @@ class PesananController extends Controller
         return 5000;
     }
 
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
     public function kurirProfil()
     {
         $kurirId = Auth::guard('kurir')->id();

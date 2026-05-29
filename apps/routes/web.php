@@ -4,10 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\AdminController;
-<<<<<<< HEAD
-=======
 use App\Http\Controllers\PembayaranController;
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 
 // 1. PUBLIC ROUTES
 Route::get('/', function () { return view('welcome'); });
@@ -25,11 +22,6 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
     Route::get('/', [PesananController::class, 'pelangganIndex'])->name('pelanggan.dashboard');
     Route::get('/pesanan-baru', [PesananController::class, 'createPesanan'])->name('pelanggan.pesanan.baru');
     Route::get('/riwayat', [PesananController::class, 'pelangganRiwayat'])->name('pelanggan.riwayat');
-<<<<<<< HEAD
-    Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
-    Route::post('/pesanan/upload-bayar/{id}', [PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
-    Route::get('/tentang-kami', function () { return view('pelanggan.tentang-kami'); });
-=======
     Route::get('/profil', [PesananController::class, 'pelangganProfil'])->name('pelanggan.profil');
     Route::get('/profil/edit', [PesananController::class, 'pelangganProfilEdit'])->name('pelanggan.profil.edit');
     Route::patch('/profil', [PesananController::class, 'pelangganProfilUpdate'])->name('pelanggan.profil.update');
@@ -44,7 +36,6 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
     Route::get('/pembayaran/{id}/create', [PembayaranController::class, 'create'])->name('pembayaran.create');
     Route::post('/pembayaran', [PembayaranController::class, 'store'])->name('pembayaran.store');
     Route::post('/pesanan/upload-bayar/{id}', [PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 });
 
 // 3. BACKEND ROUTES - ADMIN
@@ -52,19 +43,6 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
 Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () {
     Route::get('/', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
     Route::get('/pesanan', [PesananController::class, 'kelolaPesanan'])->name('admin.pesanan.kelola');
-<<<<<<< HEAD
-    Route::get('/pesanan/{id}/detail', function ($id) {$pesanan = \App\Models\Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->findOrFail($id);
-        return view('admin.detail-pesanan', compact('pesanan')); 
-    })->name('admin.pesanan.detail');
-    Route::patch('/pesanan/{id}/update', [PesananController::class, 'adminUpdatePesanan'])->name('admin.pesanan.update');
-    Route::get('/kurir', [AdminController::class, 'indexKurir'])->name('admin.kurir');
-    Route::post('/kurir/store', [AdminController::class, 'storeKurir'])->name('admin.kurir.store');
-    Route::get('/pembayaran', [PesananController::class, 'adminPembayaran'])->name('admin.pembayaran');
-    Route::get('/riwayat', [PesananController::class, 'adminRiwayat'])->name('admin.riwayat');
-    Route::get('/pengaturan', [\App\Http\Controllers\AdminController::class, 'pengaturan'])->name('admin.pengaturan');
-    Route::post('/pengaturan', [\App\Http\Controllers\AdminController::class, 'updatePengaturan'])->name('admin.pengaturan.update');
-    Route::post('/layanan/store', [\App\Http\Controllers\AdminController::class, 'storeLayanan'])->name('admin.layanan.store');
-=======
     Route::get('/pesanan/{id}/detail', function ($id) {
         $pesanan = \App\Models\Pesanan::with(['pelanggan', 'layanan', 'kurir', 'pembayaran'])->findOrFail($id);
         $daftar_kurir = \App\Models\Kurir::all();
@@ -84,7 +62,6 @@ Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () 
     Route::get('/pengaturan', [AdminController::class, 'pengaturan'])->name('admin.pengaturan');
     Route::post('/pengaturan', [AdminController::class, 'updatePengaturan'])->name('admin.pengaturan.update');
     Route::post('/layanan/store', [AdminController::class, 'storeLayanan'])->name('admin.layanan.store');
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
 });
 
 // 4. BACKEND ROUTES - KURIR

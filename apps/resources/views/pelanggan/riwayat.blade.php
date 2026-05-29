@@ -32,7 +32,6 @@
             
             {{-- MENU KANAN & PROFIL --}}
             <div class="flex items-center space-x-5">
-<<<<<<< HEAD
                 <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></button>
                 <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></button>
                 
@@ -40,22 +39,6 @@
                 <div class="w-8 h-8 rounded-full border border-gray-200 overflow-hidden shadow-sm">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Profile" class="w-full h-full object-cover">
                 </div>
-=======
-                               <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
-                <a href="{{ route('pelanggan.notifikasi') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></a>
-                <a href="{{ route('pelanggan.bantuan') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></a>
-                
-                {{-- AVATAR DINAMIS --}}
-                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full border border-gray-200 overflow-hidden shadow-sm block">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Profile" class="w-full h-full object-cover">
-                </a>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </form>
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
             </div>
         </div>
     </nav>
