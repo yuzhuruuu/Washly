@@ -6,17 +6,18 @@
     <title>Admin Dashboard - Washly</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#F8FAFC] h-screen font-sans text-slate-800 flex overflow-hidden antialiased">
 
     {{-- SIDEBAR (Kiri) --}}
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+    <aside x-data class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
         {{-- Logo --}}
         <div class="p-6">
             <img src="{{ asset('images/w-a.svg') }}" alt="Washly Admin" class="h-8">
         </div>
 
-        {{-- Profil Admin (SINKRON DATABASE) --}}
+        {{-- Profil Admin --}}
         <div class="px-6 flex items-center gap-3 mb-8">
             <div class="w-10 h-10 rounded-full border border-gray-100 overflow-hidden shadow-sm">
                 <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin') }}&background=00AEEF&color=fff" alt="Admin Profile" class="w-full h-full object-cover">
@@ -55,7 +56,7 @@
             </form>
         </nav>
 
-        {{-- Tombol Tambah Layanan (Bawah) --}}
+        {{-- Tombol Tambah Layanan (Bawah) - TRIGGER --}}
         <div class="p-5 mt-auto">
             <button @click="$dispatch('buka-modal-layanan')" class="w-full text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                 <i class="fas fa-plus"></i> Tambah Layanan
@@ -64,7 +65,7 @@
     </aside>
 
     {{-- KONTEN UTAMA (Kanan) --}}
-    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false, modalTambahPesananManual: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -85,12 +86,12 @@
             {{-- Judul Seksi & Tombol Tambah --}}
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Statistik Hari Ini</h2>
-                <button class="bg-[#00AEEF] hover:bg-blue-500 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-md shadow-blue-200 transition active:scale-95 flex items-center gap-2">
+                <button type="button" @click="modalTambahPesananManual = true" class="bg-[#00AEEF] hover:bg-blue-500 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-md shadow-blue-200 transition active:scale-95 flex items-center gap-2">
                     <i class="fas fa-plus-circle"></i> Tambah Pesanan Manual
                 </button>
             </div>
 
-            {{-- 4 KOTAK STATISTIK (SINKRON VARIABEL) --}}
+            {{-- 4 KOTAK STATISTIK --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                 
                 {{-- Card 1: Pesanan Hari Ini --}}
@@ -145,7 +146,7 @@
 
             </div>
 
-            {{-- TABEL PESANAN TERBARU (SINKRON PERULANGAN) --}}
+            {{-- TABEL PESANAN TERBARU --}}
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-7">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-lg font-bold text-gray-800">Pesanan Terbaru</h2>
@@ -164,26 +165,16 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm">
-                            
                             @forelse($pesananTerbaru ?? [] as $pesanan)
                                 <tr class="border-b border-gray-50 hover:bg-gray-50/80 transition">
                                     <td class="py-4 font-semibold text-gray-700">#ORD-{{ str_pad($pesanan->id_pesanan ?? $pesanan->id, 4, '0', STR_PAD_LEFT) }}</td>
                                     <td class="py-4">
                                         <div class="flex items-center gap-3">
-                                            {{-- Logika Avatar Dinamis & Warna-warni --}}
                                             @php
                                                 $nama = $pesanan->pelanggan->nama ?? 'Unknown';
                                                 $kata = explode(' ', $nama);
                                                 $inisial = strtoupper(substr($kata[0], 0, 1) . (isset($kata[1]) ? substr($kata[1], 0, 1) : ''));
-                                                
-                                                // Daftar warna persis seperti mockup FE
-                                                $warna = [
-                                                    'bg-blue-100 text-blue-500', 
-                                                    'bg-cyan-100 text-cyan-600', 
-                                                    'bg-orange-100 text-orange-600',
-                                                    'bg-indigo-100 text-indigo-500',
-                                                    'bg-pink-100 text-pink-500'
-                                                ];
+                                                $warna = ['bg-blue-100 text-blue-500', 'bg-cyan-100 text-cyan-600', 'bg-orange-100 text-orange-600', 'bg-indigo-100 text-indigo-500', 'bg-pink-100 text-pink-500'];
                                                 $warnaPilih = $warna[crc32($nama) % count($warna)];
                                             @endphp
                                             <div class="w-8 h-8 rounded-full {{ $warnaPilih }} flex items-center justify-center text-[10px] font-bold">
@@ -194,7 +185,6 @@
                                     </td>
                                     <td class="py-4 text-gray-500 font-medium">{{ $pesanan->layanan->nama_layanan ?? 'N/A' }}</td>
                                     <td class="py-4">
-                                        {{-- Logika Warna Badge Status Persis FE --}}
                                         @if(($pesanan->status_pembayaran ?? '') == 'Belum Lunas' || ($pesanan->status ?? '') == 'Menunggu Pembayaran')
                                             <span class="bg-red-50 text-red-500 px-3 py-1.5 rounded-full text-[10px] font-bold">Menunggu Bayar</span>
                                         @elseif(($pesanan->status ?? '') == 'Selesai')
@@ -216,7 +206,6 @@
                                     </td>
                                 </tr>
                             @endforelse
-
                         </tbody>
                     </table>
                 </div>
@@ -228,7 +217,6 @@
         <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
             <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
                 
-                {{-- Tombol Close X --}}
                 <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
                     <i class="fas fa-times"></i>
                 </button>
@@ -236,12 +224,9 @@
                 <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
                 <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
 
-                {{-- Form Kirim Data ke Controller --}}
                 <form action="{{ route('admin.layanan.store') }}" method="POST">
                     @csrf
-                    
                     <div class="space-y-5">
-                        {{-- Input Nama Layanan --}}
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
@@ -250,7 +235,6 @@
                             </div>
                         </div>
 
-                        {{-- Input Harga per KG --}}
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
@@ -265,6 +249,64 @@
                     </button>
                 </form>
 
+            </div>
+        </div>
+
+        <div x-show="modalTambahPesananManual" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahPesananManual = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full relative transform scale-100 transition-transform">
+                <button @click="modalTambahPesananManual = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-shopping-cart mr-2"></i>Tambah Pesanan Manual</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Isi data pelanggan dan layanan untuk membuat pesanan langsung dari dashboard admin.</p>
+
+                <form action="{{ route('admin.pesanan.store') }}" method="POST" class="space-y-5">
+                    @csrf
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Pelanggan</label>
+                            <input type="text" name="nama_pelanggan" placeholder="Misal: Budi Santoso" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('nama_pelanggan') }}">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Email Pelanggan</label>
+                                <input type="email" name="email" placeholder="email@example.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('email') }}">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">No. HP</label>
+                                <input type="text" name="no_hp" placeholder="0812xxxx" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('no_hp') }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Alamat Pengambilan</label>
+                            <textarea name="alamat" rows="3" placeholder="Jl. Contoh No. 1, Jakarta" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('alamat') }}</textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Jenis Layanan</label>
+                                <select name="id_layanan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                                    <option value="" disabled selected>Pilih layanan</option>
+                                    @foreach($daftar_layanan as $layanan)
+                                        <option value="{{ $layanan->id_layanan }}" {{ old('id_layanan') == $layanan->id_layanan ? 'selected' : '' }}>{{ $layanan->nama_layanan }} - Rp {{ number_format($layanan->harga_per_kg, 0, ',', '.') }}/kg</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Berat (kg)</label>
+                                <input type="number" step="0.1" name="berat" placeholder="1.5" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('berat') }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Catatan (opsional)</label>
+                            <textarea name="catatan" rows="2" placeholder="Contoh: jemput sore ini" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('catatan') }}</textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Pesanan Manual
+                    </button>
+                </form>
             </div>
         </div>
     </main>

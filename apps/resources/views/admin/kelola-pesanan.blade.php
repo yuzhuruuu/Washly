@@ -6,11 +6,12 @@
     <title>Kelola Pesanan - Washly Admin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-[#F8FAFC] h-screen font-sans text-slate-800 flex overflow-hidden">
 
     {{-- SIDEBAR KONSISTEN --}}
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+    <aside x-data class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
         {{-- Logo --}}
         <div class="p-6">
             <img src="{{ asset('images/w-a.svg') }}" alt="Washly Admin" class="h-8">
@@ -19,10 +20,12 @@
         {{-- Profil Admin --}}
         <div class="px-6 flex items-center gap-3 mb-8">
             <div class="w-10 h-10 rounded-full border border-gray-100 overflow-hidden shadow-sm">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=00AEEF&color=fff" alt="Admin Profile" class="w-full h-full object-cover">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin') }}&background=00AEEF&color=fff" alt="Admin Profile" class="w-full h-full object-cover">
             </div>
             <div>
-                <h3 class="font-bold text-sm text-gray-800 leading-tight">Admin</h3>
+                <h3 class="font-bold text-sm text-gray-800 leading-tight truncate w-32" title="{{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin' }}">
+                    {{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin' }}
+                </h3>
                 <p class="text-[10px] text-gray-500 font-medium mt-0.5">Panel Kendali Utama</p>
             </div>
         </div>
@@ -58,16 +61,17 @@
             </form>
         </nav>
 
-        {{-- Tombol Tambah Layanan --}}
+        {{-- Tombol Tambah Layanan (TRIGGER POPUP) --}}
         <div class="p-5 mt-auto">
-            <button class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+            <button @click="$dispatch('buka-modal-layanan')" class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                 <i class="fas fa-plus"></i> Tambah Layanan
             </button>
         </div>
     </aside>
 
     {{-- KONTEN UTAMA --}}
-    <main class="flex-1 p-10 overflow-y-auto">
+    {{-- 🔥 TAMBAH STATE ALPINE.JS --}}
+    <main class="flex-1 p-10 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
         <div class="flex justify-between items-center mb-8">
             <h1 class="text-2xl font-bold text-gray-800">Kelola Pesanan</h1>
             
@@ -85,7 +89,7 @@
             @forelse($semua_pesanan ?? [] as $p)
                 <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition">
                     <div class="flex justify-between items-start mb-4">
-                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">WS-{{ $p->id_pesanan }}</span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">WS-{{ str_pad($p->id_pesanan ?? $p->id, 3, '0', STR_PAD_LEFT) }}</span>
                         
                         {{-- Logika Badge Pewarnaan Status Dinamis Biar Keren --}}
                         @php
@@ -98,7 +102,7 @@
                                 $badgeColor = 'bg-purple-100 text-purple-600';
                             } elseif($p->status == 'delivery') {
                                 $badgeColor = 'bg-cyan-100 text-cyan-600';
-                            } elseif($p->status == 'selesai') {
+                            } elseif(in_array($p->status, ['selesai', 'Selesai'])) {
                                 $badgeColor = 'bg-green-100 text-green-600';
                             }
                         @endphp
@@ -125,7 +129,7 @@
                     </div>
 
                     {{-- Link diarahkan ke Halaman Detail Bawaan Rute Laravel Baru --}}
-                    <a href="{{ route('admin.pesanan.detail', $p->id_pesanan) }}" class="block w-full bg-gray-100 hover:bg-[#0074A6] hover:text-white text-center py-3 rounded-xl text-sm font-bold transition">
+                    <a href="{{ route('admin.pesanan.detail', $p->id_pesanan ?? $p->id) }}" class="block w-full bg-gray-100 hover:bg-[#0074A6] hover:text-white text-center py-3 rounded-xl text-sm font-bold transition">
                         Detail & Update
                     </a>
                 </div>
@@ -141,6 +145,46 @@
             @endforelse
 
         </div>
+
+        {{-- 🔥 MODAL POP-UP TAMBAH LAYANAN (DITEMPEL DI BAWAH KONTEN) 🔥 --}}
+        <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
+                
+                <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
+
+                <form action="{{ route('admin.layanan.store') }}" method="POST">
+                    @csrf
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <i class="fas fa-tag text-gray-400 mr-3"></i>
+                                <input type="text" name="nama_layanan" placeholder="Misal: Cuci Karpet" required class="bg-transparent border-none w-full text-sm font-semibold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
+                                <input type="number" name="harga_per_kg" placeholder="15000" required class="bg-transparent border-none w-full text-sm font-bold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Layanan Baru
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
     </main>
 </body>
 </html>
