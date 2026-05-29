@@ -54,7 +54,7 @@
             {{-- No HP --}}
             <div class="relative">
                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i class="fas fa-phone"></i></span>
-                <input type="text" name="no_hp" value="{{ old('no_hp') }}" required class="w-full bg-[#E8EDF2] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] placeholder-gray-400" placeholder="No. HP / WhatsApp">
+                <input type="text" name="no_hp" value="{{ old('no_hp') }}" required class="w-full bg-[#E8EDF2] border-none rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-[#0074A6] placeholder-gray-400" placeholder="No. WhatsApp (Format 62...)">
             </div>
 
             {{-- Password --}}

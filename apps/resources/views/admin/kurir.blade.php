@@ -14,41 +14,43 @@
 <body class="bg-[#F8FAFC] h-screen font-sans text-slate-800 flex overflow-hidden">
 
     {{-- SIDEBAR KONSISTEN --}}
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
+    <aside x-data class="w-64 bg-white border-r border-gray-100 flex flex-col h-full shrink-0 relative z-20">
         <div class="p-6">
             <img src="{{ asset('images/w-a.svg') }}" alt="Washly Admin" class="h-8">
         </div>
 
         <div class="px-6 flex items-center gap-3 mb-8">
             <div class="w-10 h-10 rounded-full border border-gray-100 overflow-hidden shadow-sm">
-                <img src="https://ui-avatars.com/api/?name=Admin&background=00AEEF&color=fff" alt="Admin Profile" class="w-full h-full object-cover">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin') }}&background=00AEEF&color=fff" alt="Admin Profile" class="w-full h-full object-cover">
             </div>
             <div>
-                <h3 class="font-bold text-sm text-gray-800 leading-tight">Admin</h3>
+                <h3 class="font-bold text-sm text-gray-800 leading-tight truncate w-32" title="{{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin' }}">
+                    {{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin' }}
+                </h3>
                 <p class="text-[10px] text-gray-500 font-medium mt-0.5">Panel Kendali Utama</p>
             </div>
         </div>
 
         <nav class="flex-1 px-4 space-y-1">
-            <a href="{{ url('/dashboard/admin') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-th-large w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Dashboard
             </a>
-            <a href="{{ url('/dashboard/admin/pesanan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('admin.pesanan.kelola') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-clipboard-list w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Kelola Pesanan
             </a>
-            <a href="{{ url('/dashboard/admin/pembayaran') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('admin.pembayaran') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-wallet w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Pembayaran
             </a>
             
             {{-- MENU KURIR (Aktif) --}}
-            <a href="{{ url('/dashboard/admin/kurir') }}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-[#0074A6] rounded-xl font-bold text-sm transition">
+            <a href="{{ route('admin.kurir') }}" class="flex items-center gap-3 px-4 py-3 bg-blue-50 text-[#0074A6] rounded-xl font-bold text-sm transition mb-1">
                 <i class="fas fa-motorcycle w-5 text-center"></i> Kurir
             </a>
             
-            <a href="{{ url('/dashboard/admin/riwayat') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('admin.riwayat') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-history w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Riwayat Admin
             </a>
-            <a href="{{ url('/dashboard/admin/pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
+            <a href="{{ route('admin.pengaturan') }}" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] rounded-xl font-medium text-sm transition group">
                 <i class="fas fa-cog w-5 text-center text-gray-400 group-hover:text-[#0074A6] transition"></i> Pengaturan
             </a>
             <form action="{{ route('logout') }}" method="POST" class="block w-full">
@@ -59,22 +61,22 @@
             </form>
         </nav>
 
+        {{-- TRIGGER MODAL --}}
         <div class="p-5 mt-auto">
-            <button class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
+            <button @click="$dispatch('buka-modal-layanan')" class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2">
                 <i class="fas fa-plus"></i> Tambah Layanan
             </button>
         </div>
     </aside>
 
     {{-- KONTEN UTAMA --}}
-    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ showModal: {{ $errors->has('username') ? 'true' : 'false' }} }">
+    {{-- 🔥 PERHATIKAN: Variabel "showModal" dan "modalTambahLayanan" disatukan di sini --}}
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ showModal: {{ $errors->has('username') ? 'true' : 'false' }}, modalTambahLayanan: false, showFilter: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
         
-        {{-- Hiasan Background Blobs --}}
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-50/50 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
         <div class="p-10 max-w-6xl mx-auto relative z-10">
             
-            {{-- Header & Tombol Tambah --}}
             <div class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-4xl font-black text-gray-800 mb-2">Kelola Kurir</h1>
@@ -85,28 +87,45 @@
                 </button>
             </div>
 
-            {{-- Flash Notification Status --}}
             @if(session('success'))
                 <div class="bg-green-100 border border-green-200 text-green-700 px-5 py-3 rounded-2xl text-xs font-bold shadow-sm mb-6 flex items-center gap-2">
                     <i class="fas fa-check-circle text-green-500"></i> {{ session('success') }}
                 </div>
             @endif
 
-            {{-- Action Bar --}}
-            <div class="flex gap-4 mb-8">
-                <div class="relative flex-1">
+            <div class="flex gap-4 mb-4">
+                <form action="{{ route('admin.kurir') }}" method="GET" class="relative flex-1">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Cari nama, username, atau nomor HP..." class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm font-medium focus:outline-none focus:border-[#0074A6] focus:ring-1 focus:ring-[#0074A6] transition">
-                </div>
-                <button class="bg-white border border-gray-200 text-gray-600 px-5 py-3 rounded-xl text-sm font-bold hover:bg-gray-50 transition flex items-center gap-2">
+                    <input type="text" name="cari" value="{{ request('cari') }}" placeholder="Cari nama, username, atau nomor HP..." class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-12 pr-4 text-sm font-medium focus:outline-none focus:border-[#0074A6] focus:ring-1 focus:ring-[#0074A6] transition">
+                </form>
+                <button type="button" @click="showFilter = !showFilter" class="bg-white border border-gray-200 text-gray-600 px-5 py-3 rounded-xl text-sm font-bold hover:bg-gray-50 transition flex items-center gap-2">
                     <i class="fas fa-filter text-gray-400"></i> Filter
                 </button>
-                <button class="bg-white border border-gray-200 text-gray-600 px-5 py-3 rounded-xl text-sm font-bold hover:bg-gray-50 transition flex items-center gap-2">
+                <a href="{{ route('admin.kurir.export', request()->query()) }}" class="bg-white border border-gray-200 text-gray-600 px-5 py-3 rounded-xl text-sm font-bold hover:bg-gray-50 transition flex items-center gap-2">
                     <i class="fas fa-download text-gray-400"></i> Export
-                </button>
+                </a>
             </div>
 
-            {{-- Table Kurir Card --}}
+            <div x-show="showFilter" x-cloak x-transition.opacity class="mb-6 bg-white border border-gray-200 rounded-3xl shadow-sm p-5">
+                <form action="{{ route('admin.kurir') }}" method="GET" class="grid gap-4 md:grid-cols-2 items-end">
+                    <input type="hidden" name="cari" value="{{ request('cari') }}">
+
+                    <div>
+                        <label for="status" class="block text-[11px] font-bold text-gray-500 mb-2">Status Kurir</label>
+                        <select id="status" name="status" class="w-full bg-white border border-slate-200 rounded-xl py-3.5 px-4 text-sm font-medium text-slate-700 focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition">
+                            <option value="" {{ request('status') ? '' : 'selected' }}>Semua Status</option>
+                            <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="nonaktif" {{ request('status') === 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2 justify-end md:justify-start">
+                        <button type="submit" class="w-full md:w-auto bg-[#1D5D8A] text-white px-6 py-3.5 rounded-xl text-sm font-bold hover:bg-[#174b67] transition">Terapkan</button>
+                        <a href="{{ route('admin.kurir') }}" class="w-full md:w-auto bg-white border border-slate-200 text-slate-600 px-6 py-3.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition text-center">Reset</a>
+                    </div>
+                </form>
+            </div>
+
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -124,7 +143,6 @@
                                 <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition">
                                     <td class="py-4 px-6">
                                         <div class="flex items-center gap-3">
-                                            {{-- UI Avatar dinamis berdasarkan nama kurir --}}
                                             <img src="https://ui-avatars.com/api/?name={{ urlencode($kurir->nama) }}&background=E0F2FE&color=0369A1&bold=true" alt="{{ $kurir->nama }}" class="w-10 h-10 rounded-full object-cover border border-gray-50">
                                             <div>
                                                 <p class="font-bold text-[#1D5D8A]">{{ $kurir->nama }}</p>
@@ -135,7 +153,6 @@
                                     <td class="py-4 px-6 text-gray-600 font-mono text-xs bg-gray-50/50 rounded px-2">{{ $kurir->username }}</td>
                                     <td class="py-4 px-6 text-gray-600 flex items-center gap-2 h-full my-auto"><i class="fas fa-phone-alt text-blue-400 text-xs"></i> {{ $kurir->no_hp }}</td>
                                     <td class="py-4 px-6">
-                                        {{-- Deteksi status tugas aktif kurir secara otomatis --}}
                                         @php 
                                             $sedangSibuk = $kurir->pesanan ? $kurir->pesanan()->whereIn('status', ['menunggu_pickup', 'delivery'])->count() : 0; 
                                         @endphp
@@ -151,8 +168,16 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-6 text-right space-x-2">
-                                        <button class="text-blue-400 hover:text-blue-600 transition"><i class="far fa-edit"></i></button>
-                                        <button class="text-red-400 hover:text-red-600 transition"><i class="far fa-trash-alt"></i></button>
+                                        <a href="{{ route('admin.kurir.edit', $kurir->id_kurir) }}" class="text-blue-400 hover:text-blue-600 transition inline-flex items-center justify-center">
+                                            <i class="far fa-edit"></i>
+                                        </a>
+                                        <form action="{{ route('admin.kurir.destroy', $kurir->id_kurir) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus kurir ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-400 hover:text-red-600 transition inline-flex items-center justify-center">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @empty
@@ -166,7 +191,6 @@
                     </table>
                 </div>
                 
-                {{-- Pagination Statis --}}
                 <div class="px-6 py-4 border-t border-gray-100 flex justify-between items-center bg-gray-50/30">
                     <p class="text-xs text-gray-500 font-medium">Total: {{ count($daftar_kurir ?? []) }} Petugas Logistik</p>
                     <div class="flex gap-1">
@@ -177,9 +201,7 @@
                 </div>
             </div>
 
-            {{-- Summary Cards Bawah --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {{-- Total Kurir Dinamis --}}
                 <div class="bg-blue-50/50 p-6 rounded-3xl border border-blue-100 flex flex-col justify-between">
                     <div class="flex items-start gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl text-white flex items-center justify-center text-xl shrink-0" style="background-color: #1D5D8A;">
@@ -193,7 +215,6 @@
                     <p class="text-xs text-gray-500 font-medium">Jumlah kurir aktif yang terintegrasi dalam ekosistem operasional Washly.</p>
                 </div>
 
-                {{-- Card Pengiriman --}}
                 <div class="bg-red-50/50 p-6 rounded-3xl border border-red-100 flex flex-col justify-between">
                     <div class="flex items-start gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-red-100 text-red-500 flex items-center justify-center text-xl shrink-0">
@@ -212,7 +233,6 @@
                     </div>
                 </div>
 
-                {{-- Card Rating --}}
                 <div class="bg-yellow-50/50 p-6 rounded-3xl border border-yellow-100 flex flex-col justify-between">
                     <div class="flex items-start gap-4 mb-4">
                         <div class="w-12 h-12 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-xl shrink-0">
@@ -231,7 +251,7 @@
 
         </div>
 
-        {{-- MODAL TAMBAH KURIR BARU --}}
+        {{-- MODAL 1: TAMBAH KURIR BARU --}}
         <div x-cloak x-show="showModal" 
              class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm"
              x-transition:enter="transition ease-out duration-300"
@@ -261,11 +281,9 @@
                          </div>
                      </div>
 
-                     {{-- DIHUBUNGKAN KE ROUTE STORE KURIR DI ADMINCONTROLLER --}}
                      <form action="{{ route('admin.kurir.store') }}" method="POST" class="space-y-5">
                          @csrf
                          
-                         {{-- Input Nama --}}
                          <div>
                              <label class="block text-xs font-semibold text-gray-600 mb-2">Nama Lengkap</label>
                              <div class="relative">
@@ -275,20 +293,17 @@
                          </div>
 
                          <div class="grid grid-cols-2 gap-4">
-                             {{-- Input Username --}}
                              <div>
                                  <label class="block text-xs font-semibold text-gray-600 mb-2">Username</label>
                                  <div class="relative">
                                      <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                                      <input type="text" name="username" value="{{ old('username') }}" placeholder="username_" class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-[#1D5D8A] focus:ring-1 focus:ring-[#1D5D8A] transition" required>
                                  </div>
-                                 {{-- Error Warning Username Kembar --}}
                                  @error('username')
                                      <p class="text-red-500 text-[10px] mt-1 font-bold">❌ Username sudah terpakai ege!</p>
                                  @enderror
                              </div>
                              
-                             {{-- Input Nomor HP --}}
                              <div>
                                  <label class="block text-xs font-semibold text-gray-600 mb-2">Nomor HP</label>
                                  <div class="relative">
@@ -298,7 +313,6 @@
                              </div>
                          </div>
 
-                         {{-- Input Password --}}
                          <div>
                              <label class="block text-xs font-semibold text-gray-600 mb-2">Password</label>
                              <div class="relative">
@@ -308,7 +322,6 @@
                              <p class="text-[10px] text-gray-400 mt-2">Gunakan kombinasi password yang kuat untuk menjaga privasi akun petugas.</p>
                          </div>
 
-                         {{-- Tombol Submit --}}
                          <div class="flex gap-3 pt-2">
                              <button type="submit" class="flex-1 text-white py-3.5 rounded-xl text-sm font-bold shadow-md transition flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #1D5D8A;">
                                  <i class="fas fa-save"></i> Simpan Kurir
@@ -331,6 +344,46 @@
 
             </div>
         </div>
+
+        {{-- MODAL 2: POP UP TAMBAH LAYANAN 🔥 --}}
+        <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
+                
+                <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
+
+                <form action="{{ route('admin.layanan.store') }}" method="POST">
+                    @csrf
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <i class="fas fa-tag text-gray-400 mr-3"></i>
+                                <input type="text" name="nama_layanan" placeholder="Misal: Cuci Karpet" required class="bg-transparent border-none w-full text-sm font-semibold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
+                                <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
+                                <input type="number" name="harga_per_kg" placeholder="15000" required class="bg-transparent border-none w-full text-sm font-bold text-gray-700 focus:outline-none p-0 m-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Layanan Baru
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
     </main>
 </body>
 </html>

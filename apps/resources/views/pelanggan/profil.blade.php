@@ -6,28 +6,36 @@
     <title>Profil Saya - Washly</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-[#F8FAFC] min-h-screen font-sans text-slate-800 antialiased relative overflow-x-hidden">
+<body class="bg-[#F8FAFC] min-h-screen font-sans text-slate-800 pb-12">
 
-    {{-- Background Glowing Blobs - Bikin estetik gak polos --}}
-    <div class="absolute top-0 left-0 w-96 h-96 bg-blue-100 rounded-full blur-[120px] opacity-60 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"></div>
-    <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cyan-100 rounded-full blur-[150px] opacity-40 translate-x-1/3 translate-y-1/3 pointer-events-none z-0"></div>
-    
     {{-- NAVBAR --}}
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center relative">
-            <div class="flex items-center"><img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8"></div>
-            <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
-                <a href="{{ url('/dashboard/pelanggan') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
-                <a href="{{ url('/layanan/pesan') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
-                <a href="#" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
-                <a href="#" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
+            <div class="flex items-center">
+                <img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8">
             </div>
+
+            <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
+                <a href="{{ route('pelanggan.dashboard') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Beranda</a>
+                <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
+            </div>
+
             <div class="flex items-center space-x-5">
-                <button class="text-[#0074A6]"><i class="far fa-bell text-lg"></i></button>
-                <div class="w-8 h-8 rounded-full bg-[#0074A6] text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                    JB
-                </div>
+                <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
+                <a href="{{ route('pelanggan.notifikasi') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></a>
+                <a href="{{ route('pelanggan.bantuan') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></a>
+                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200 block">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </nav>
@@ -39,17 +47,18 @@
         <div class="flex flex-col items-center mb-10 mt-16">
             <div class="relative w-28 h-28 mb-4">
                 <div class="w-full h-full rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200">
-                    <img src="https://ui-avatars.com/api/?name=Justin+Bieber&background=0074A6&color=fff&size=150" alt="Profile" class="w-full h-full object-cover">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($pelanggan->nama ?? 'User') }}&background=0074A6&color=fff&size=150" alt="Profile" class="w-full h-full object-cover">
                 </div>
                 <button class="absolute bottom-0 right-0 bg-[#0074A6] w-8 h-8 rounded-full shadow-md flex items-center justify-center text-white border-2 border-white hover:bg-[#005B82] transition">
                     <i class="fas fa-pen text-[10px]"></i>
                 </button>
             </div>
-            <h2 class="text-2xl font-bold text-gray-800">Justin Bieber</h2>
-            <p class="text-sm text-gray-500 mb-4">justinbieber@gmail.com</p>
-            <button class="px-6 py-2 bg-[#0074A6] hover:bg-[#005B82] text-white rounded-full text-xs font-semibold shadow-md flex items-center gap-2 transition">
+            <h2 class="text-2xl font-bold text-gray-800">{{ $pelanggan->nama ?? 'Pelanggan' }}</h2>
+            <p class="text-sm text-gray-500">{{ $pelanggan->email ?? 'Email tidak tersedia' }}</p>
+            <p class="text-sm text-gray-400 mb-4">{{ $pelanggan->username ? '@' . $pelanggan->username : '-' }}</p>
+            <a href="{{ route('pelanggan.profil.edit') }}" class="px-6 py-2 bg-[#0074A6] hover:bg-[#005B82] text-white rounded-full text-xs font-semibold shadow-md flex items-center gap-2 transition">
                 <i class="fas fa-user-edit text-[10px]"></i> Edit Profil
-            </button>
+            </a>
         </div>
 
         {{-- GRID STATS & INFO --}}
@@ -64,7 +73,7 @@
                         <div class="w-10 h-10 bg-blue-50 text-blue-400 rounded-full flex items-center justify-center mb-3">
                             <i class="fas fa-shopping-bag"></i>
                         </div>
-                        <p class="text-2xl font-bold text-gray-800 leading-none mb-1">12</p>
+                        <p class="text-2xl font-bold text-gray-800 leading-none mb-1">{{ \App\Models\Pesanan::where('id_pelanggan', $pelanggan->id_pelanggan)->count() }}</p>
                         <p class="text-[10px] font-semibold text-gray-400 tracking-wider">PESANAN</p>
                     </div>
                     {{-- Selesai (Centang udah gak double!) --}}
@@ -72,7 +81,7 @@
                         <div class="w-10 h-10 bg-green-50 text-green-400 rounded-full flex items-center justify-center mb-3">
                             <i class="fas fa-check-circle"></i>
                         </div>
-                        <p class="text-2xl font-bold text-gray-800 leading-none mb-1">10</p>
+                        <p class="text-2xl font-bold text-gray-800 leading-none mb-1">{{ \App\Models\Pesanan::where('id_pelanggan', $pelanggan->id_pelanggan)->where('status', 'selesai')->count() }}</p>
                         <p class="text-[10px] font-semibold text-gray-400 tracking-wider">SELESAI</p>
                     </div>
                 </div>
@@ -84,11 +93,11 @@
                             <i class="fas fa-receipt"></i>
                         </div>
                         <div>
-                            <p class="text-xl font-bold text-gray-800 leading-none mb-1">2</p>
+                            <p class="text-xl font-bold text-gray-800 leading-none mb-1">{{ \App\Models\Pesanan::where('id_pelanggan', $pelanggan->id_pelanggan)->whereIn('status', ['menunggu_pickup','menunggu_timbang','menunggu_bayar','menunggu_konfirmasi','proses','delivery'])->count() }}</p>
                             <p class="text-[10px] font-semibold text-gray-400 tracking-wider">AKTIF</p>
                         </div>
                     </div>
-                    <a href="{{ url('/pesanan/status') }}" class="text-[#0074A6] text-xs font-bold hover:underline">Lihat</a>
+                    <a href="{{ route('pelanggan.status') }}" class="text-[#0074A6] text-xs font-bold hover:underline">Lihat</a>
                 </div>
             </div>
 
@@ -105,25 +114,25 @@
                     <div class="space-y-2">
                         <label class="text-[11px] font-medium text-gray-800">Nama</label>
                         <div class="bg-gray-100 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 w-full">
-                            Justin Bieber
+                            {{ $pelanggan->nama ?? '-' }}
                         </div>
                     </div>
                     <div class="space-y-2">
                         <label class="text-[11px] font-medium text-gray-800">Email</label>
                         <div class="bg-gray-100 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 w-full">
-                            justinbieber@gmail.com
+                            {{ $pelanggan->email ?? '-' }}
                         </div>
                     </div>
                     <div class="space-y-2">
                         <label class="text-[11px] font-medium text-gray-800">No. Telepon</label>
                         <div class="bg-gray-100 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 w-full">
-                            +62 812 3456 7890
+                            {{ $pelanggan->no_hp ?? '-' }}
                         </div>
                     </div>
                     <div class="space-y-2">
                         <label class="text-[11px] font-medium text-gray-800">Alamat Default</label>
                         <div class="bg-gray-100 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 w-full truncate">
-                            Gg. Pisang No 13B, Gunungpati.
+                            {{ $pelanggan->alamat ?? 'Belum ditentukan' }}
                         </div>
                     </div>
                 </div>
@@ -133,7 +142,7 @@
 
         {{-- MENU LIST (Bebas nge-scroll sekarang) --}}
         <div class="flex flex-col gap-3 mb-10">
-            <a href="#" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
+            <a href="{{ route('pelanggan.notifikasi') }}" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-white transition">
                         <i class="far fa-bell"></i>
@@ -142,8 +151,7 @@
                 </div>
                 <i class="fas fa-chevron-right text-gray-300 text-xs transition group-hover:translate-x-1"></i>
             </a>
-
-            <a href="#" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
+            <a href="{{ route('pelanggan.ubah-password') }}" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-white transition">
                         <i class="fas fa-unlock-alt"></i>
@@ -152,8 +160,7 @@
                 </div>
                 <i class="fas fa-chevron-right text-gray-300 text-xs transition group-hover:translate-x-1"></i>
             </a>
-
-            <a href="#" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
+            <a href="{{ route('pelanggan.bantuan') }}" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-white transition">
                         <i class="far fa-question-circle"></i>
@@ -162,8 +169,7 @@
                 </div>
                 <i class="fas fa-chevron-right text-gray-300 text-xs transition group-hover:translate-x-1"></i>
             </a>
-
-            <a href="#" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
+            <a href="{{ route('pelanggan.syarat') }}" class="bg-white px-6 py-4 rounded-2xl shadow-sm flex items-center justify-between hover:bg-gray-50 transition border border-gray-100 group">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-white transition">
                         <i class="far fa-file-alt"></i>

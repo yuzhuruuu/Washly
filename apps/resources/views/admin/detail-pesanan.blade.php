@@ -165,6 +165,16 @@
                     </div>
                     
                     {{-- DIHUBUNGKAN KE ROUTE UPDATE PESANAN BACKEND KAMU --}}
+                    @php
+                        $settingsPath = storage_path('app/settings.json');
+                        $tarif_ongkir_display = 5000;
+                        if (file_exists($settingsPath)) {
+                            $s = json_decode(file_get_contents($settingsPath), true);
+                            if (is_array($s) && isset($s['tarif_ongkir'])) {
+                                $tarif_ongkir_display = intval($s['tarif_ongkir']);
+                            }
+                        }
+                    @endphp
                     <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan) }}" method="POST" class="flex-1 flex flex-col">
                         @csrf 
                         @method('PATCH')
@@ -240,16 +250,18 @@
             const dropdownStatus = document.getElementById('dropdown-status');
             const liveTotalHarga = document.getElementById('live-total-harga');
             
-            // Ambil data tarif harga per kilo dari backend laravel blade
+            // Ambil data tarif harga per kilo dan ongkir dari backend laravel blade
             const hargaPerKg = {{ $pesanan->layanan->harga_per_kg ?? 0 }};
+            const ongkir = {{ $tarif_ongkir_display ?? 5000 }};
             const statusAwal = "{{ $pesanan->status }}";
 
             if(inputBerat) {
                 inputBerat.addEventListener('input', function() {
                     const berat = parseFloat(this.value) || 0;
-                    
-                    // 1. Hitung Live Total Biaya Laundry di Layar
-                    const totalCalculated = berat * hargaPerKg;
+
+                    // 1. Hitung Live Total Biaya Laundry di Layar (include ongkir)
+                    const subtotal = berat * hargaPerKg;
+                    const totalCalculated = subtotal + ongkir;
                     liveTotalHarga.innerText = "Rp " + totalCalculated.toLocaleString('id-ID');
 
                     // 2. Fitur Auto Status: otomatis geser dropdown ke menunggu_bayar

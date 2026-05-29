@@ -33,12 +33,25 @@ class AdminController extends Controller
     }
 
     
-    public function indexKurir()
+    public function indexKurir(Request $request)
     {
-        // Ambil semua data kurir dari database urut dari yang terbaru
-        $daftar_kurir = Kurir::latest()->get();
-        
-        // Tampilkan ke halaman admin.kurir
+        $query = Kurir::query();
+
+        if ($request->filled('cari')) {
+            $cari = $request->cari;
+            $query->where(function ($q) use ($cari) {
+                $q->where('nama', 'like', "%{$cari}%")
+                  ->orWhere('username', 'like', "%{$cari}%")
+                  ->orWhere('no_hp', 'like', "%{$cari}%");
+            });
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['aktif', 'nonaktif'])) {
+            $query->where('status', $request->status);
+        }
+
+        $daftar_kurir = $query->latest()->get();
+
         return view('admin.kurir', compact('daftar_kurir'));
     }
 
@@ -61,6 +74,94 @@ class AdminController extends Controller
         return back()->with('success', 'Akun Kurir berhasil dibuat! Kurir siap bekerja.');
     }
 
+    public function editKurir($id)
+    {
+        $kurir = Kurir::findOrFail($id);
+        return view('admin.edit-kurir', compact('kurir'));
+    }
+
+    public function updateKurir(Request $request, $id)
+    {
+        $kurir = Kurir::findOrFail($id);
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'no_hp' => 'required|string|max:15',
+            'username' => 'required|string|max:255|unique:kurirs,username,' . $kurir->id_kurir . ',id_kurir',
+            'status' => 'required|in:aktif,nonaktif',
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $kurir->update([
+            'nama' => $request->nama,
+            'no_hp' => $request->no_hp,
+            'username' => $request->username,
+            'status' => $request->status,
+            'password' => $request->filled('password') ? Hash::make($request->password) : $kurir->password,
+        ]);
+
+        return redirect()->route('admin.kurir')->with('success', 'Data kurir berhasil diperbarui.');
+    }
+
+    public function destroyKurir($id)
+    {
+        $kurir = Kurir::findOrFail($id);
+        $kurir->delete();
+
+        return redirect()->route('admin.kurir')->with('success', 'Kurir berhasil dihapus.');
+    }
+
+    public function exportKurir(Request $request)
+    {
+        $query = Kurir::query();
+
+        if ($request->filled('cari')) {
+            $cari = $request->cari;
+            $query->where(function ($q) use ($cari) {
+                $q->where('nama', 'like', "%{$cari}%")
+                  ->orWhere('username', 'like', "%{$cari}%")
+                  ->orWhere('no_hp', 'like', "%{$cari}%");
+            });
+        }
+
+        if ($request->filled('status') && in_array($request->status, ['aktif', 'nonaktif'])) {
+            $query->where('status', $request->status);
+        }
+
+        $kurirs = $query->latest()->get();
+
+        $rows = [[
+            'Nama Kurir',
+            'Username',
+            'No HP',
+            'Status',
+            'Terdaftar Pada',
+        ]];
+
+        foreach ($kurirs as $kurir) {
+            $rows[] = [
+                $kurir->nama,
+                $kurir->username,
+                $kurir->no_hp,
+                ucfirst($kurir->status),
+                $kurir->created_at ? $kurir->created_at->format('Y-m-d H:i:s') : '-',
+            ];
+        }
+
+        $csv = '';
+        foreach ($rows as $row) {
+            $formatted = array_map(function ($value) {
+                return '"' . str_replace('"', '""', $value) . '"';
+            }, $row);
+            $csv .= implode(',', $formatted) . "\r\n";
+        }
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="kurir-export-' . now()->format('Y-m-d') . '.csv"',
+        ]);
+    }
+
     public function updateLayanan(Request $request, $id)
     {
         $layanan = Layanan::findOrFail($id);
@@ -80,51 +181,84 @@ class AdminController extends Controller
 
     public function pengaturan()
     {
-        // Ambil data harga dari tabel layanans berdasarkan namanya
         $tarif_cuci = \App\Models\Layanan::where('nama_layanan', 'Cuci Saja')->value('harga_per_kg') ?? 7000;
         $tarif_setrika = \App\Models\Layanan::where('nama_layanan', 'Setrika Saja')->value('harga_per_kg') ?? 5000;
         $tarif_combo = \App\Models\Layanan::where('nama_layanan', 'Cuci + Setrika')->value('harga_per_kg') ?? 15000;
 
-        // Lempar variabel harga ke halaman Blade
-        return view('admin.pengaturan', compact('tarif_cuci', 'tarif_setrika', 'tarif_combo'));
+        // baca setting ongkir dari file storage jika ada
+        $settings = $this->readSettings();
+        $tarif_ongkir = isset($settings['tarif_ongkir']) ? intval($settings['tarif_ongkir']) : 5000;
+
+        return view('admin.pengaturan', compact('tarif_cuci', 'tarif_setrika', 'tarif_combo', 'tarif_ongkir'));
     }
 
     public function updatePengaturan(Request $request)
     {
         $admin = Admin::find(Auth::guard('admin')->id());
-        
-        // 1. Simpan Nama Admin ke Database
-        if ($request->has('nama')) {
-            $admin->nama = $request->nama;
-            $admin->save();
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:admins,username,' . $admin->id_admin . ',id_admin',
+            'email' => 'required|email|max:255|unique:admins,email,' . $admin->id_admin . ',id_admin',
+            'password' => 'nullable|string|min:8|confirmed',
+            'tarif_cuci' => 'nullable|numeric|min:0',
+            'tarif_setrika' => 'nullable|numeric|min:0',
+            'tarif_combo' => 'nullable|numeric|min:0',
+            'tarif_ongkir' => 'nullable|numeric|min:0',
+        ]);
+
+        $admin->nama = $request->nama;
+        $admin->username = $request->username;
+        $admin->email = $request->email;
+
+        if ($request->filled('password')) {
+            $admin->password = $request->password;
         }
 
-        // 2. Simpan Harga Layanan ke Tabel Layanans
+        $admin->save();
+
         if ($request->has('tarif_cuci')) {
-            \App\Models\Layanan::where('nama_layanan', 'Cuci Saja')
-                ->update(['harga_per_kg' => $request->tarif_cuci]);
+            \App\Models\Layanan::where('nama_layanan', 'Cuci Saja')->update(['harga_per_kg' => $request->tarif_cuci]);
         }
         if ($request->has('tarif_setrika')) {
-            \App\Models\Layanan::where('nama_layanan', 'Setrika Saja')
-                ->update(['harga_per_kg' => $request->tarif_setrika]);
+            \App\Models\Layanan::where('nama_layanan', 'Setrika Saja')->update(['harga_per_kg' => $request->tarif_setrika]);
         }
         if ($request->has('tarif_combo')) {
-            \App\Models\Layanan::where('nama_layanan', 'Cuci + Setrika')
-                ->update(['harga_per_kg' => $request->tarif_combo]);
+            \App\Models\Layanan::where('nama_layanan', 'Cuci + Setrika')->update(['harga_per_kg' => $request->tarif_combo]);
+        }
+        // simpan tarif ongkir ke file setting
+        if ($request->has('tarif_ongkir')) {
+            $settings = $this->readSettings();
+            $settings['tarif_ongkir'] = intval($request->tarif_ongkir);
+            $this->saveSettings($settings);
         }
         
         return back()->with('success', 'Pengaturan dan Tarif berhasil disimpan!');
     }
+
+    private function readSettings()
+    {
+        $path = storage_path('app/settings.json');
+        if (!file_exists($path)) return [];
+        $json = file_get_contents($path);
+        $data = json_decode($json, true);
+        return is_array($data) ? $data : [];
+    }
+
+    private function saveSettings(array $data)
+    {
+        $path = storage_path('app/settings.json');
+        file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
     public function storeLayanan(Request $request)
     {
-        // Validasi data yang masuk
         $request->validate([
             'nama_layanan' => 'required|string|max:255',
             'harga_per_kg' => 'required|numeric|min:0',
         ]);
 
-        // Simpan ke database tabel layanans
-        \App\Models\Layanan::create([
+        Layanan::create([
             'nama_layanan' => $request->nama_layanan,
             'harga_per_kg' => $request->harga_per_kg,
         ]);

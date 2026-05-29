@@ -25,9 +25,11 @@
 
             <div class="flex items-center space-x-5">
                 <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
-                <div class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200">
+                <a href="{{ route('pelanggan.notifikasi') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></a>
+                <a href="{{ route('pelanggan.bantuan') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></a>
+                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200 block">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
-                </div>
+                </a>
                 <form action="{{ route('logout') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
@@ -79,7 +81,7 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Pesanan Aktif Kamu</h2>
                 <div class="space-y-4">
                     @forelse($semua_pesanan ?? [] as $p)
-                        <div onclick="window.location.href='{{ url('/dashboard/pelanggan/status') }}'" class="bg-white rounded-xl p-4 flex items-center shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer">
+                        <div onclick="window.location.href='{{ route('pelanggan.status') }}'" class="bg-white rounded-xl p-4 flex items-center shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer">
                             <div class="flex-1">
                                 <p class="text-sm font-bold text-gray-800">WS-{{ $p->id_pesanan }}</p>
                                 <p class="text-[10px] text-gray-400">{{ str_replace('_', ' ', $p->status) }}</p>

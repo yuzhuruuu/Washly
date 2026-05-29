@@ -69,14 +69,22 @@
                     <p class="text-sm text-gray-500 font-medium">Pantau semua penyelesaian tugas pengambilan dan pengiriman Anda.</p>
                 </div>
                 
-                {{-- Aksi Header --}}
+                {{-- Aksi Header: Filter Form --}}
                 <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    <button class="bg-white border border-gray-200 text-gray-600 rounded-full px-6 py-3.5 flex items-center justify-center gap-3 text-sm font-semibold shadow-sm transition">
-                        <i class="far fa-calendar-alt"></i> 10 Jan 2025 - 12 Jan 2025
-                    </button>
-                    <button class="text-white rounded-full px-8 py-3.5 flex items-center justify-center gap-2 text-sm font-bold shadow-md transition" style="background-color: #00AEEF;">
-                        <i class="fas fa-filter"></i> Filter
-                    </button>
+                    <form method="GET" action="{{ route('kurir.riwayat') }}" class="flex items-center gap-3 bg-white border border-gray-100 rounded-full px-4 py-2">
+                        <select name="filter_status" class="bg-transparent outline-none text-sm text-gray-600">
+                            <option value="all" {{ request('filter_status', 'all') == 'all' ? 'selected' : '' }}>Semua</option>
+                            <option value="selesai" {{ request('filter_status') == 'selesai' ? 'selected' : '' }}>Selesai (Antar)</option>
+                            <option value="menunggu_timbang" {{ request('filter_status') == 'menunggu_timbang' ? 'selected' : '' }}>Pickup Selesai</option>
+                        </select>
+
+                        <input type="date" name="from" value="{{ request('from') }}" class="text-sm text-gray-600">
+                        <input type="date" name="to" value="{{ request('to') }}" class="text-sm text-gray-600">
+
+                        <button type="submit" class="text-white rounded-full px-4 py-2 text-sm font-bold shadow-md" style="background-color: #00AEEF;">
+                            <i class="fas fa-filter"></i> Terapkan
+                        </button>
+                    </form>
                 </div>
             </div>
 
