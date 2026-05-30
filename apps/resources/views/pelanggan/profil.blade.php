@@ -21,11 +21,11 @@
                 <a href="{{ route('pelanggan.dashboard') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Beranda</a>
                 <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
                 <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
+                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
             </div>
 
             <div class="flex items-center space-x-5">
                 <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
-                <a href="{{ route('pelanggan.notifikasi') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></a>
                 <a href="{{ route('pelanggan.bantuan') }}" class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></a>
                 <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200 block">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
@@ -45,14 +45,14 @@
 
         {{-- HEADER PROFIL (Langsung dikasih mt-16 di sini biar turun menjauh dari navbar) --}}
         <div class="flex flex-col items-center mb-10 mt-16">
-            <div class="relative w-28 h-28 mb-4">
-                <div class="w-full h-full rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200">
+            <a href="{{ route('pelanggan.profil.edit') }}" class="relative w-28 h-28 mb-4 group">
+                <div class="w-full h-full rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200 group-hover:shadow-xl transition">
                     <img src="https://ui-avatars.com/api/?name={{ urlencode($pelanggan->nama ?? 'User') }}&background=0074A6&color=fff&size=150" alt="Profile" class="w-full h-full object-cover">
                 </div>
-                <button class="absolute bottom-0 right-0 bg-[#0074A6] w-8 h-8 rounded-full shadow-md flex items-center justify-center text-white border-2 border-white hover:bg-[#005B82] transition">
+                <div class="absolute bottom-0 right-0 bg-[#0074A6] w-8 h-8 rounded-full shadow-md flex items-center justify-center text-white border-2 border-white hover:bg-[#005B82] transition group-hover:scale-110">
                     <i class="fas fa-pen text-[10px]"></i>
-                </button>
-            </div>
+                </div>
+            </a>
             <h2 class="text-2xl font-bold text-gray-800">{{ $pelanggan->nama ?? 'Pelanggan' }}</h2>
             <p class="text-sm text-gray-500">{{ $pelanggan->email ?? 'Email tidak tersedia' }}</p>
             <p class="text-sm text-gray-400 mb-4">{{ $pelanggan->username ? '@' . $pelanggan->username : '-' }}</p>

@@ -18,27 +18,30 @@
     <div class="absolute top-1/3 right-0 w-[400px] h-[400px] bg-cyan-100/30 rounded-full blur-[100px] translate-x-1/3 pointer-events-none z-0"></div>
 
     {{-- NAVBAR --}}
-    <nav class="bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center relative">
-            <div class="flex items-center"><img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8"></div>
-            
-            {{-- LINK NAVIGASI --}}
+            <div class="flex items-center">
+                <img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8">
+            </div>
+
             <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
                 <a href="{{ route('pelanggan.dashboard') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
                 <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
-                {{-- Tab Riwayat Aktif --}}
                 <a href="{{ route('pelanggan.riwayat') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Riwayat</a>
+                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
             </div>
-            
-            {{-- MENU KANAN & PROFIL --}}
+
             <div class="flex items-center space-x-5">
-                <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-bell text-lg"></i></button>
-                <button class="text-gray-400 hover:text-[#0074A6] transition"><i class="far fa-question-circle text-lg"></i></button>
-                
-                {{-- AVATAR DINAMIS (Bukan Justin Bieber lagi wkwk) --}}
-                <div class="w-8 h-8 rounded-full border border-gray-200 overflow-hidden shadow-sm">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Profile" class="w-full h-full object-cover">
+                <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
+                <div class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
                 </div>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </nav>

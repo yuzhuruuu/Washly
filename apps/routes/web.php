@@ -31,6 +31,7 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
     Route::post('/ubah-password', [PesananController::class, 'pelangganUpdatePassword'])->name('pelanggan.ubah-password.update');
     Route::get('/bantuan', [PesananController::class, 'pelangganBantuan'])->name('pelanggan.bantuan');
     Route::get('/syarat-ketentuan', function() { return view('pelanggan.syarat'); })->name('pelanggan.syarat');
+    Route::get('/tentang-kami', function() { return view('pelanggan.tentang-kami'); })->name('pelanggan.tentang-kami');
     Route::get('/status/{id?}', [PesananController::class, 'pelangganStatus'])->name('pelanggan.status');
     Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
     Route::get('/pembayaran/{id}/create', [PembayaranController::class, 'create'])->name('pembayaran.create');

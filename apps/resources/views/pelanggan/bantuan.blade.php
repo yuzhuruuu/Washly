@@ -23,21 +23,18 @@
             
             <!-- Navigation Links (Dipaku mati di tengah!) -->
             <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-500 absolute left-1/2 transform -translate-x-1/2 z-0">
-                <a href="/dashboard/pelanggan" class="hover:text-[#0074A6] transition">Beranda</a>
-                <a href="/layanan/pesan" class="hover:text-[#0074A6] transition">Layanan</a>
-                <a href="/riwayat" class="hover:text-[#0074A6] transition">Riwayat</a>
-                <a href="/preview-about" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Tentang Kami</a>
+                <a href="{{ route('pelanggan.dashboard') }}" class="hover:text-[#0074A6] transition">Beranda</a>
+                <a href="{{ route('pelanggan.pesanan.baru') }}" class="hover:text-[#0074A6] transition">Layanan</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="hover:text-[#0074A6] transition">Riwayat</a>
+                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Tentang Kami</a>
             </div>
             
             <!-- User Profile & Actions (Kanan) -->
             <div class="flex items-center gap-5 relative z-10">
-                <span class="text-sm font-medium text-gray-700 hidden sm:block">Halo, Justin!</span>
-                <button class="text-blue-500 hover:bg-blue-50 w-9 h-9 rounded-full flex items-center justify-center transition">
-                    <i class="far fa-question-circle"></i>
-                </button>
-                <div class="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden cursor-pointer">
-                    <img src="https://i.pravatar.cc/150?img=11" alt="Profile" class="w-full h-full object-cover">
-                </div>
+                <span class="text-sm font-medium text-gray-700 hidden sm:block">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'User' }}!</span>
+                <a href="{{ route('pelanggan.profil') }}" class="w-10 h-10 rounded-full border-2 border-white shadow-sm overflow-hidden cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Profile" class="w-full h-full object-cover">
+                </a>
             </div>
             
         </div>

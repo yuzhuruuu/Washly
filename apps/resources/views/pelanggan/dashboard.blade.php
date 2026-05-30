@@ -21,6 +21,7 @@
                 <a href="{{ route('pelanggan.dashboard') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Beranda</a>
                 <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
                 <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
+                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
             </div>
 
             <div class="flex items-center space-x-5">
@@ -79,7 +80,7 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Pesanan Aktif Kamu</h2>
                 <div class="space-y-4">
                     @forelse($semua_pesanan ?? [] as $p)
-                        <div onclick="window.location.href='{{ url('/dashboard/pelanggan/status') }}'" class="bg-white rounded-xl p-4 flex items-center shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer">
+                        <div onclick=\"window.location.href='{{ route('pelanggan.status') }}'\" class=\"bg-white rounded-xl p-4 flex items-center shadow-sm border border-gray-100 hover:shadow-md transition cursor-pointer\">
                             <div class="flex-1">
                                 <p class="text-sm font-bold text-gray-800">WS-{{ $p->id_pesanan }}</p>
                                 <p class="text-[10px] text-gray-400">{{ str_replace('_', ' ', $p->status) }}</p>

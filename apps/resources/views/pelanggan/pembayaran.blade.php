@@ -12,11 +12,14 @@
 
     {{-- NAVBAR HEADER --}}
     <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center relative">
-            <a href="{{ url('/layanan/pesan') }}" class="text-gray-600 hover:text-gray-900 transition absolute left-6">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between relative">
+            <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-600 hover:text-gray-900 transition">
                 <i class="fas fa-arrow-left text-lg"></i>
             </a>
-            <h1 class="text-lg font-bold text-gray-800 w-full text-center">Pembayaran</h1>
+            <h1 class="text-lg font-bold text-gray-800">Pembayaran</h1>
+            <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner">
+                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
+            </a>
         </div>
     </nav>
 

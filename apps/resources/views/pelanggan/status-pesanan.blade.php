@@ -23,6 +23,7 @@
                 <a href="{{ route('pelanggan.dashboard') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Beranda</a>
                 <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
                 <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
+                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
             </div>
 
             <div class="flex items-center space-x-5">
@@ -157,20 +158,20 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div x-show="step === 0" class="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-sm" style="display: none;">
+                    <div x-show="step === 0" class="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-sm">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-sm">
-                                <i class="fas fa-exclamation-triangle"></i>
+                                <i class="fas fa-credit-card"></i>
                             </div>
-                            <h3 class="font-bold text-orange-700 text-lg leading-tight">Menunggu Konfirmasi</h3>
+                            <h3 class="font-bold text-orange-700 text-lg leading-tight">Lakukan Pembayaran</h3>
                         </div>
                         <p class="text-xs font-semibold text-orange-600 mb-2">Langkah Selanjutnya:</p>
                         <p class="text-sm text-orange-700/80 leading-relaxed mb-6">
-                            Kami sedang memverifikasi bukti pembayaran Anda. Harap tunggu sebentar.
+                            Admin sudah mengkonfirmasi harga untuk pesanan Anda. Selesaikan pembayaran sekarang untuk mengaktifkan proses laundry.
                         </p>
-                        <div class="pt-4 border-t border-orange-200/50 flex items-center gap-2 text-[11px] font-bold text-orange-600">
-                            <i class="fas fa-clock"></i> Cek berkala
-                        </div>
+                        <a href="{{ route('pembayaran.create', $pesanan->id_pesanan) }}" class="mt-4 block w-full px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-lg text-center transition shadow-sm">
+                            <i class="fas fa-credit-card mr-2"></i> Lakukan Pembayaran
+                        </a>
                     </div>
 
                     <div x-show="step > 0" class="bg-gradient-to-br from-[#E0FCFE] to-[#D0F4F8] border border-cyan-100 rounded-2xl p-6 shadow-sm">
