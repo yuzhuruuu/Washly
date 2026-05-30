@@ -93,21 +93,6 @@
                         
                         <h2 class="text-xl font-bold text-gray-800 mb-6 relative z-10">Informasi Admin</h2>
                         
-<<<<<<< HEAD
-                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
-                            {{-- Foto Profil Dinamis Bawaan --}}
-                            <div class="relative w-24 h-24 shrink-0">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username ?? 'Admin') }}&background=1D5D8A&color=fff&size=150" alt="Admin Profile" class="w-full h-full rounded-full object-cover border-4 border-white shadow-sm">
-                                <button type="button" class="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center text-[#1D5D8A] shadow-md border border-gray-100 hover:bg-gray-50 transition">
-                                    <i class="fas fa-pencil-alt text-xs"></i>
-                                </button>
-                            </div>
-                            
-                            {{-- Input Nama Lengkap (SINKRON DB) --}}
-                            <div class="w-full">
-                                <label class="block text-xs font-semibold text-gray-600 mb-2">Nama Lengkap</label>
-                                <input type="text" name="nama" value="{{ Auth::guard('admin')->user()?->nama ?? Auth::guard('admin')->user()?->username }}" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
-=======
                         <div class="space-y-5 relative z-10">
                             <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                                 {{-- Foto Profil Dinamis Bawaan --}}
@@ -148,7 +133,6 @@
                                     <label class="block text-xs font-semibold text-gray-600 mb-2">Konfirmasi Password</label>
                                     <input type="password" name="password_confirmation" placeholder="Ulangi password baru" class="w-full bg-slate-100 border-none rounded-xl py-3.5 px-4 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
                                 </div>
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                             </div>
                         </div>
                     </div>
@@ -197,14 +181,10 @@
 
                 {{-- KOLOM KANAN (Tarif & Layanan) --}}
                 <div class="lg:col-span-5 flex flex-col">
-                    
-<<<<<<< HEAD
-{{-- Card 3: Tarif --}}
-                    <div class="bg-slate-100 p-7 rounded-3xl border border-slate-200 shadow-sm flex-1 flex flex-col">
-=======
+                
                     {{-- Card 3: Tarif --}}
                     <div class="bg-slate-100 p-7 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
+
                         <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
                             <i class="fas fa-money-bill-wave text-[#1D5D8A]"></i> Tarif & Layanan
                         </h2>
@@ -246,11 +226,8 @@
                                 <div class="flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
                                     <div class="flex items-center flex-1">
                                         <span class="text-gray-400 font-bold mr-2 text-sm">Rp</span>
-<<<<<<< HEAD
-                                        <input type="text" name="tarif_ongkir" value="5000" class="bg-transparent border-none w-full font-bold text-gray-700 text-sm focus:outline-none p-0 m-0">
-=======
+
                                         <input type="text" name="tarif_ongkir" value="{{ $tarif_ongkir ?? 5000 }}" class="bg-transparent border-none w-full font-bold text-gray-700 text-sm focus:outline-none p-0 m-0">
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                     </div>
                                     <i class="fas fa-truck text-[#1D5D8A]"></i>
                                 </div>

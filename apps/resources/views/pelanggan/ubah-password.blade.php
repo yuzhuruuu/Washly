@@ -45,7 +45,7 @@
         
         <!-- Header Navigasi Balik -->
         <div class="mb-8 flex items-center gap-4">
-            <a href="/profil" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] transition shadow-sm">
+            <a href="{{ route('pelanggan.profil') }}" class="w-10 h-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-[#0074A6] transition shadow-sm">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>

@@ -9,7 +9,7 @@ class PembayaranController extends Controller
     public function create($id)
     {
         $pesanan = \App\Models\Pesanan::findOrFail($id);
-        return view('pembayaran.create', compact('pesanan'));
+        return view('pelanggan.pembayaran', compact('pesanan'));
     }
 
     public function store(Request $request)

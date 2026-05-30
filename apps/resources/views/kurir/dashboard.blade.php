@@ -147,7 +147,7 @@
                         </div>
                         
                         {{-- Tombol WhatsApp --}}
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $t->pelanggan->no_hp ?? '') }}?text={{ urlencode('Halo, saya kurir Washly untuk pesanan #' . ($t->id_pesanan ?? '') . '. Mohon bantu share kode lock atau patokan lokasi pick-up yang lebih akurat (titik jemput, lantai, gerbang, atau foto). Terima kasih.') }}" target="_blank" class="text-[#25D366] text-xs font-bold hover:underline mb-6 inline-flex items-center gap-1">
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $t->pelanggan->no_hp ?? '') }}?text={{ urlencode('Halo, saya kurir Washly untuk pesanan #' . ($t->id_pesanan ?? '') . '. Mohon bantu share kode lock atau patokan lokasi yang lebih akurat (titik jemput, lantai, gerbang, atau foto). Terima kasih.') }}" target="_blank" class="text-[#25D366] text-xs font-bold hover:underline mb-6 inline-flex items-center gap-1">
                             <i class="fab fa-whatsapp text-sm"></i> Hubungi Pelanggan
                         </a>
 

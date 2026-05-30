@@ -56,11 +56,7 @@
             </form>
         </nav>
 
-<<<<<<< HEAD
         {{-- Tombol Tambah Layanan (Bawah) --}}
-=======
-        {{-- Tombol Tambah Layanan (Bawah) - TRIGGER --}}
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
         <div class="p-5 mt-auto">
             <button @click="$dispatch('buka-modal-layanan')" class="w-full text-white py-3 rounded-xl text-sm font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                 <i class="fas fa-plus"></i> Tambah Layanan
@@ -69,11 +65,7 @@
     </aside>
 
     {{-- KONTEN UTAMA (Kanan) --}}
-<<<<<<< HEAD
     <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
-=======
-    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false, modalTambahPesananManual: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -173,24 +165,17 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm">
-<<<<<<< HEAD
                             
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                             @forelse($pesananTerbaru ?? [] as $pesanan)
                                 <tr class="border-b border-gray-50 hover:bg-gray-50/80 transition">
                                     <td class="py-4 font-semibold text-gray-700">#ORD-{{ str_pad($pesanan->id_pesanan ?? $pesanan->id, 4, '0', STR_PAD_LEFT) }}</td>
                                     <td class="py-4">
                                         <div class="flex items-center gap-3">
-<<<<<<< HEAD
                                             {{-- Logika Avatar Dinamis & Warna-warni --}}
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                             @php
                                                 $nama = $pesanan->pelanggan->nama ?? 'Unknown';
                                                 $kata = explode(' ', $nama);
                                                 $inisial = strtoupper(substr($kata[0], 0, 1) . (isset($kata[1]) ? substr($kata[1], 0, 1) : ''));
-<<<<<<< HEAD
                                                 
                                                 // Daftar warna persis seperti mockup FE
                                                 $warna = [
@@ -200,9 +185,6 @@
                                                     'bg-indigo-100 text-indigo-500',
                                                     'bg-pink-100 text-pink-500'
                                                 ];
-=======
-                                                $warna = ['bg-blue-100 text-blue-500', 'bg-cyan-100 text-cyan-600', 'bg-orange-100 text-orange-600', 'bg-indigo-100 text-indigo-500', 'bg-pink-100 text-pink-500'];
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                                 $warnaPilih = $warna[crc32($nama) % count($warna)];
                                             @endphp
                                             <div class="w-8 h-8 rounded-full {{ $warnaPilih }} flex items-center justify-center text-[10px] font-bold">
@@ -213,10 +195,7 @@
                                     </td>
                                     <td class="py-4 text-gray-500 font-medium">{{ $pesanan->layanan->nama_layanan ?? 'N/A' }}</td>
                                     <td class="py-4">
-<<<<<<< HEAD
                                         {{-- Logika Warna Badge Status Persis FE --}}
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                                         @if(($pesanan->status_pembayaran ?? '') == 'Belum Lunas' || ($pesanan->status ?? '') == 'Menunggu Pembayaran')
                                             <span class="bg-red-50 text-red-500 px-3 py-1.5 rounded-full text-[10px] font-bold">Menunggu Bayar</span>
                                         @elseif(($pesanan->status ?? '') == 'Selesai')
@@ -238,10 +217,6 @@
                                     </td>
                                 </tr>
                             @endforelse
-<<<<<<< HEAD
-
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         </tbody>
                     </table>
                 </div>
@@ -253,10 +228,7 @@
         <div x-show="modalTambahLayanan" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
             <div @click.outside="modalTambahLayanan = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full relative transform scale-100 transition-transform">
                 
-<<<<<<< HEAD
                 {{-- Tombol Close X --}}
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                 <button @click="modalTambahLayanan = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
                     <i class="fas fa-times"></i>
                 </button>
@@ -264,18 +236,12 @@
                 <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-plus-circle mr-2"></i>Tambah Layanan</h2>
                 <p class="text-xs text-gray-500 mb-6 font-medium">Masukkan nama layanan baru beserta tarif per kilogramnya.</p>
 
-<<<<<<< HEAD
                 {{-- Form Kirim Data ke Controller --}}
                 <form action="{{ route('admin.layanan.store') }}" method="POST">
                     @csrf
                     
                     <div class="space-y-5">
                         {{-- Input Nama Layanan --}}
-=======
-                <form action="{{ route('admin.layanan.store') }}" method="POST">
-                    @csrf
-                    <div class="space-y-5">
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Layanan</label>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
@@ -284,10 +250,7 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
                         {{-- Input Harga per KG --}}
-=======
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-2">Harga (per kg / pcs)</label>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center focus-within:ring-2 focus-within:ring-[#1D5D8A] transition">
@@ -304,67 +267,6 @@
 
             </div>
         </div>
-<<<<<<< HEAD
-=======
-
-        <div x-show="modalTambahPesananManual" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
-            <div @click.outside="modalTambahPesananManual = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full relative transform scale-100 transition-transform">
-                <button @click="modalTambahPesananManual = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold">
-                    <i class="fas fa-times"></i>
-                </button>
-
-                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-shopping-cart mr-2"></i>Tambah Pesanan Manual</h2>
-                <p class="text-xs text-gray-500 mb-6 font-medium">Isi data pelanggan dan layanan untuk membuat pesanan langsung dari dashboard admin.</p>
-
-                <form action="{{ route('admin.pesanan.store') }}" method="POST" class="space-y-5">
-                    @csrf
-                    <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Pelanggan</label>
-                            <input type="text" name="nama_pelanggan" placeholder="Misal: Budi Santoso" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('nama_pelanggan') }}">
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Email Pelanggan</label>
-                                <input type="email" name="email" placeholder="email@example.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('email') }}">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-500 mb-2">No. HP</label>
-                                <input type="text" name="no_hp" placeholder="0812xxxx" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('no_hp') }}">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Alamat Pengambilan</label>
-                            <textarea name="alamat" rows="3" placeholder="Jl. Contoh No. 1, Jakarta" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('alamat') }}</textarea>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Jenis Layanan</label>
-                                <select name="id_layanan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
-                                    <option value="" disabled selected>Pilih layanan</option>
-                                    @foreach($daftar_layanan as $layanan)
-                                        <option value="{{ $layanan->id_layanan }}" {{ old('id_layanan') == $layanan->id_layanan ? 'selected' : '' }}>{{ $layanan->nama_layanan }} - Rp {{ number_format($layanan->harga_per_kg, 0, ',', '.') }}/kg</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Berat (kg)</label>
-                                <input type="number" step="0.1" name="berat" placeholder="1.5" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('berat') }}">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Catatan (opsional)</label>
-                            <textarea name="catatan" rows="2" placeholder="Contoh: jemput sore ini" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('catatan') }}</textarea>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
-                        <i class="fas fa-save"></i> Simpan Pesanan Manual
-                    </button>
-                </form>
-            </div>
-        </div>
->>>>>>> 1aa579cc41edae45803d9ea51980ca0d1dde8be7
     </main>
 
 </body>

@@ -334,6 +334,7 @@ class PesananController extends Controller
     {
         $pesanan = null;
         $step = 0;
+        $isMenungguKonfirmasi = false;
 
         if ($id) {
             $pesanan = Pesanan::where('id_pesanan', $id)
@@ -348,8 +349,11 @@ class PesananController extends Controller
         }
 
         if ($pesanan) {
-            if (in_array($pesanan->status, ['menunggu_bayar', 'menunggu_konfirmasi'])) {
+            if ($pesanan->status === 'menunggu_bayar') {
                 $step = 0;
+            } elseif ($pesanan->status === 'menunggu_konfirmasi') {
+                $step = 0; 
+                $isMenungguKonfirmasi = true; 
             } elseif ($pesanan->status === 'menunggu_pickup') {
                 $step = 1;
             } elseif ($pesanan->status === 'menunggu_timbang') {
@@ -358,12 +362,12 @@ class PesananController extends Controller
                 $step = 3;
             } elseif ($pesanan->status === 'delivery') {
                 $step = 4;
-            } elseif ($pesanan->status === 'selesai') {
+            } elseif (in_array($pesanan->status, ['selesai', 'Selesai'])) {
                 $step = 5;
             }
         }
 
-        return view('pelanggan.status-pesanan', compact('pesanan', 'step'));
+        return view('pelanggan.status-pesanan', compact('pesanan', 'step', 'isMenungguKonfirmasi'));
     }
 
     public function pelangganProfilUpdate(Request $request)
@@ -432,7 +436,9 @@ class PesananController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Bukti berhasil diupload! Tunggu admin validasi ya.');
+        // 🔥 FIX RUTE: Ini yang bener, ngelempar ke halaman status dengan id pesanan! 🔥
+        return redirect()->route('pelanggan.status', $pesanan->id_pesanan ?? $pesanan->id)
+                         ->with('success', 'Bukti berhasil diupload! Tunggu admin validasi ya.');
     }
 
     // ==========================================

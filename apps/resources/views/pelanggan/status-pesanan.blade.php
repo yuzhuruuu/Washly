@@ -20,9 +20,9 @@
             </div>
 
             <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
-                <a href="{{ route('pelanggan.dashboard') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Beranda</a>
+                <a href="{{ route('pelanggan.dashboard') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
                 <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-400 hover:text-gray-600 transition">Layanan</a>
-                <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Riwayat</a>
                 <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
             </div>
 
@@ -41,13 +41,16 @@
         </div>
     </nav>
 
+    {{-- 🔥 TAMBAHIN VARIABEL isMenungguKonfirmasi DARI CONTROLLER KE SINI --}}
     <main class="max-w-5xl mx-auto px-6 mt-12 relative z-10"
           x-data="{ 
               hasPesanan: {{ $pesanan ? 'true' : 'false' }},
               step: {{ $pesanan ? ($step ?? 0) : 0 }}, 
+              isMenungguKonfirmasi: {{ $isMenungguKonfirmasi ?? false ? 'true' : 'false' }},
               getStatusText() {
                   if(!this.hasPesanan) return 'BELUM ADA PESANAN';
-                  if(this.step === 0) return 'MENUNGGU PEMBAYARAN';
+                  if(this.step === 0 && !this.isMenungguKonfirmasi) return 'MENUNGGU PEMBAYARAN';
+                  if(this.step === 0 && this.isMenungguKonfirmasi) return 'MENUNGGU KONFIRMASI';
                   if(this.step === 1) return 'DITERIMA';
                   if(this.step === 2) return 'DIJEMPUT';
                   if(this.step === 3) return 'DIPROSES';
@@ -56,9 +59,17 @@
               }
           }">
         
+        {{-- Pesan Flash Success habis nge-upload foto (Kalau Ada) --}}
+        @if(session('success'))
+            <div class="mb-8 bg-green-100 border border-green-200 text-green-700 px-5 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3">
+                <i class="fas fa-check-circle text-xl text-green-500"></i>
+                <p>{{ session('success') }}</p>
+            </div>
+        @endif
+
         {{-- Tombol Kembali & Judul --}}
         <div class="flex items-center gap-5 mb-8">
-            <a href="{{ route('pelanggan.dashboard') }}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 hover:bg-gray-50 transition border border-gray-100">
+            <a href="{{ route('pelanggan.riwayat') }}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-gray-600 hover:bg-gray-50 transition border border-gray-100">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <h1 class="text-3xl font-bold text-gray-800">Status Pesanan</h1>
@@ -69,16 +80,20 @@
                 <div class="flex justify-between items-start mb-12">
                     <div>
                         <p class="text-[11px] font-bold tracking-widest text-gray-400 mb-1">NO. PESANAN</p>
-                        <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">WS-{{ $pesanan->id_pesanan }}</h2>
+                        <h2 class="text-3xl font-extrabold text-gray-800 tracking-tight">WS-{{ date('Y') }}-{{ str_pad($pesanan->id_pesanan ?? $pesanan->id, 3, '0', STR_PAD_LEFT) }}</h2>
                         <p class="text-sm text-gray-500 mt-1">{{ $pesanan->layanan?->nama_layanan ?? 'Layanan Tidak Diketahui' }}</p>
                     </div>
+                    
+                    {{-- 🔥 BADGE STATUS DINAMIS --}}
                     <div class="px-4 py-1.5 rounded-full text-xs font-bold shadow-sm border transition-all"
-                         :class="step === 0 ? 'bg-red-50 text-red-600 border-red-100' : (step === 5 ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-500 border-orange-100')"
+                         :class="(step === 0 && !isMenungguKonfirmasi) ? 'bg-red-50 text-red-600 border-red-100' : 
+                                ((step === 0 && isMenungguKonfirmasi) ? 'bg-blue-50 text-blue-600 border-blue-100' : 
+                                (step === 5 ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-500 border-orange-100'))"
                          x-text="getStatusText()">
                     </div>
                 </div>
 
-                {{-- STEPPER UI YANG BENAR-BENAR BERSIH DARI ABSOLUTE LINE --}}
+                {{-- STEPPER UI --}}
                 <div class="flex items-center justify-between w-full mx-auto max-w-4xl px-4 mt-8">
                     <div class="flex flex-col items-center relative z-10 w-14">
                         <div class="w-14 h-14 rounded-full flex items-center justify-center text-xl transition-all duration-300 shadow-md"
@@ -151,6 +166,10 @@
                             <span class="text-sm font-bold text-gray-800">{{ $pesanan->berat ? number_format($pesanan->berat, 1, ',', '.') . ' Kg' : 'Belum ditimbang' }}</span>
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm text-gray-500">Total Tagihan</span>
+                            <span class="text-sm font-bold text-[#00AEEF]">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
                             <span class="text-sm text-gray-500">Tanggal Selesai (Est)</span>
                             <span class="text-sm font-bold text-gray-800">{{ $pesanan->created_at ? $pesanan->created_at->copy()->addDay()->format('d M Y, H:i') : '-' }}</span>
                         </div>
@@ -158,7 +177,8 @@
                 </div>
 
                 <div class="lg:col-span-1">
-                    <div x-show="step === 0" class="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-sm">
+                    {{-- 🔥 CARD KETIKA BELUM BAYAR SAMA SEKALI --}}
+                    <div x-show="step === 0 && !isMenungguKonfirmasi" class="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-sm">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-sm">
                                 <i class="fas fa-credit-card"></i>
@@ -169,22 +189,40 @@
                         <p class="text-sm text-orange-700/80 leading-relaxed mb-6">
                             Admin sudah mengkonfirmasi harga untuk pesanan Anda. Selesaikan pembayaran sekarang untuk mengaktifkan proses laundry.
                         </p>
-                        <a href="{{ route('pembayaran.create', $pesanan->id_pesanan) }}" class="mt-4 block w-full px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-lg text-center transition shadow-sm">
+                        <a href="{{ route('pelanggan.pembayaran', $pesanan->id_pesanan ?? $pesanan->id) }}" class="mt-4 block w-full px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-lg text-center transition shadow-sm">
                             <i class="fas fa-credit-card mr-2"></i> Lakukan Pembayaran
                         </a>
                     </div>
 
-                    <div x-show="step > 0" class="bg-gradient-to-br from-[#E0FCFE] to-[#D0F4F8] border border-cyan-100 rounded-2xl p-6 shadow-sm">
+                    {{-- 🔥 CARD KETIKA SUDAH UPLOAD BUKTI TAPI BELUM DI ACC ADMIN --}}
+                    <div x-show="step === 0 && isMenungguKonfirmasi" style="display: none;" class="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-sm">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <h3 class="font-bold text-blue-800 text-lg leading-tight">Verifikasi Admin</h3>
+                        </div>
+                        <p class="text-xs font-semibold text-blue-600 mb-2">Langkah Selanjutnya:</p>
+                        <p class="text-sm text-blue-800/80 leading-relaxed mb-6">
+                            Terima kasih! Bukti transfer Anda sudah kami terima dan sedang dalam antrean pengecekan oleh Admin Washly. 
+                        </p>
+                        <div class="w-full h-1.5 bg-blue-200 rounded-full overflow-hidden">
+                            <div class="w-1/2 h-full bg-blue-500 rounded-full animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    {{-- 🔥 CARD KETIKA PESANAN SUDAH JALAN (DITERIMA - SELESAI) --}}
+                    <div x-show="step > 0" style="display: none;" class="bg-gradient-to-br from-[#E0FCFE] to-[#D0F4F8] border border-cyan-100 rounded-2xl p-6 shadow-sm">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-8 h-8 bg-[#005B82] text-white rounded-full flex items-center justify-center shadow-sm">
                                 <i class="fas fa-check"></i>
                             </div>
-                            <h3 class="font-bold text-[#005B82] text-lg leading-tight">Pesanan Berhasil!</h3>
+                            <h3 class="font-bold text-[#005B82] text-lg leading-tight">Pesanan Berjalan!</h3>
                         </div>
-                        <p class="text-xs font-semibold text-[#005B82] mb-2">Langkah Selanjutnya:</p>
+                        <p class="text-xs font-semibold text-[#005B82] mb-2">Proses Saat Ini:</p>
                         <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 1">Kurir kami sedang bersiap untuk menjemput pakaian Anda di lokasi.</p>
                         <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 2">Kurir telah menjemput pakaian Anda dan sedang dalam perjalanan ke outlet Washly.</p>
-                        <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 3">Pesanan Anda sedang diproses oleh tim kami. Anda akan menerima notifikasi jika pakaian sudah siap untuk diantar.</p>
+                        <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 3">Pesanan Anda sedang diproses oleh tim kami. Pakaian akan dicuci dan disetrika dengan rapi.</p>
                         <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 4">Pakaian Anda sudah wangi paripurna dan siap diantarkan kembali oleh kurir!</p>
                         <p class="text-sm text-gray-600 leading-relaxed mb-6" x-show="step === 5">Pesanan selesai. Terima kasih telah mempercayakan cucian Anda pada Washly!</p>
                         <div class="pt-4 border-t border-cyan-200 flex items-center gap-2 text-[11px] font-bold text-[#0074A6]">
@@ -193,20 +231,19 @@
                     </div>
                 </div>
             </div>
-        </div>
-    @else
-        <div class="bg-white rounded-[2rem] p-10 shadow-sm border border-gray-50 mb-8 text-center">
-            <div class="text-center py-20">
-                <p class="text-sm text-gray-400 uppercase tracking-[0.2em] mb-4">Belum ada pesanan</p>
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Kamu belum memesan laundry.</h2>
-                <p class="text-sm text-gray-500 mb-8">Silakan pesan layanan sekarang atau lihat riwayat kalau kamu sudah pernah memesan.</p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <a href="{{ route('pelanggan.pesanan.baru') }}" class="px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">Pesan Sekarang</a>
-                    <a href="{{ route('pelanggan.riwayat') }}" class="px-6 py-3 rounded-full border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition">Lihat Riwayat</a>
+        @else
+            <div class="bg-white rounded-[2rem] p-10 shadow-sm border border-gray-50 mb-8 text-center">
+                <div class="text-center py-20">
+                    <p class="text-sm text-gray-400 uppercase tracking-[0.2em] mb-4">Belum ada pesanan</p>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">Kamu belum memesan laundry.</h2>
+                    <p class="text-sm text-gray-500 mb-8">Silakan pesan layanan sekarang atau lihat riwayat kalau kamu sudah pernah memesan.</p>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <a href="{{ route('pelanggan.pesanan.baru') }}" class="px-6 py-3 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition">Pesan Sekarang</a>
+                        <a href="{{ route('pelanggan.riwayat') }}" class="px-6 py-3 rounded-full border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition">Lihat Riwayat</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
 
         <div class="text-center mt-16 mb-8">
             <a href="{{ route('pelanggan.bantuan') }}" class="text-[#0074A6] hover:text-blue-800 font-bold text-sm flex justify-center items-center gap-2 transition">

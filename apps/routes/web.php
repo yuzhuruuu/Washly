@@ -17,7 +17,6 @@ Route::post('/register', [AuthController::class, 'register']);
 
 
 // 2. BACKEND ROUTES - PELANGGAN
-// 🔥 Penjaga pintu dikembalikan ke auth:pelanggan
 Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(function () {
     Route::get('/', [PesananController::class, 'pelangganIndex'])->name('pelanggan.dashboard');
     Route::get('/pesanan-baru', [PesananController::class, 'createPesanan'])->name('pelanggan.pesanan.baru');
@@ -25,7 +24,6 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
     Route::get('/profil', [PesananController::class, 'pelangganProfil'])->name('pelanggan.profil');
     Route::get('/profil/edit', [PesananController::class, 'pelangganProfilEdit'])->name('pelanggan.profil.edit');
     Route::patch('/profil', [PesananController::class, 'pelangganProfilUpdate'])->name('pelanggan.profil.update');
-    // Profile helper pages
     Route::get('/notifikasi', [PesananController::class, 'pelangganNotifikasi'])->name('pelanggan.notifikasi');
     Route::get('/ubah-password', [PesananController::class, 'pelangganUbahPassword'])->name('pelanggan.ubah-password');
     Route::post('/ubah-password', [PesananController::class, 'pelangganUpdatePassword'])->name('pelanggan.ubah-password.update');
@@ -34,13 +32,12 @@ Route::middleware(['auth:pelanggan'])->prefix('dashboard/pelanggan')->group(func
     Route::get('/tentang-kami', function() { return view('pelanggan.tentang-kami'); })->name('pelanggan.tentang-kami');
     Route::get('/status/{id?}', [PesananController::class, 'pelangganStatus'])->name('pelanggan.status');
     Route::post('/pesan-laundry', [PesananController::class, 'store'])->name('pesanan.store');
-    Route::get('/pembayaran/{id}/create', [PembayaranController::class, 'create'])->name('pembayaran.create');
+    Route::get('/pembayaran/{id}/create', [PembayaranController::class, 'create'])->name('pelanggan.pembayaran');
     Route::post('/pembayaran', [PembayaranController::class, 'store'])->name('pembayaran.store');
     Route::post('/pesanan/upload-bayar/{id}', [PesananController::class, 'uploadPembayaran'])->name('pelanggan.upload.pembayaran');
 });
 
 // 3. BACKEND ROUTES - ADMIN
-// 🔥 Penjaga pintu dikembalikan ke auth:admin
 Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () {
     Route::get('/', [PesananController::class, 'adminIndex'])->name('admin.dashboard');
     Route::get('/pesanan', [PesananController::class, 'kelolaPesanan'])->name('admin.pesanan.kelola');
