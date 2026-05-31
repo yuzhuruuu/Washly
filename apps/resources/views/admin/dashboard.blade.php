@@ -65,7 +65,7 @@
     </aside>
 
     {{-- KONTEN UTAMA (Kanan) --}}
-    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
+    <main class="flex-1 overflow-y-auto relative z-10" x-data="{ modalTambahLayanan: false, modalTambahPesananManual: false }" @buka-modal-layanan.window="modalTambahLayanan = true">
         
         {{-- Hiasan Background Blobs --}}
         <div class="absolute bottom-0 left-0 w-96 h-96 bg-cyan-100/30 rounded-full blur-[120px] pointer-events-none z-0"></div>
@@ -78,10 +78,42 @@
                     <h1 class="text-[22px] font-bold text-gray-800">Overview Dashboard</h1>
                     <p class="text-sm text-gray-500 mt-1 font-medium">Ringkasan operasional Washly hari ini.</p>
                 </div>
-                <button class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#0074A6] hover:bg-gray-50 transition">
-                    <i class="fas fa-bell"></i>
-                </button>
             </header>
+
+            {{-- Alert Notification --}}
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                    <div class="flex-shrink-0 text-red-500 mt-0.5">
+                        <i class="fas fa-exclamation-circle text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-red-800">Terjadi Kesalahan</h3>
+                        <ul class="text-xs text-red-700 mt-2 space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'" class="flex-shrink-0 text-red-400 hover:text-red-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div x-data="{ show: true }" x-show="show" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3 animate-in fade-in duration-300">
+                    <div class="flex-shrink-0 text-green-500 mt-0.5">
+                        <i class="fas fa-check-circle text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-green-800">Berhasil!</h3>
+                        <p class="text-xs text-green-700 mt-1">{{ session('success') }}</p>
+                    </div>
+                    <button @click="show = false; setTimeout(() => show = false, 5000)" class="flex-shrink-0 text-green-400 hover:text-green-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
 
             {{-- Judul Seksi & Tombol Tambah --}}
             <div class="flex justify-between items-center mb-6">
@@ -262,6 +294,69 @@
 
                     <button type="submit" class="w-full text-white py-3.5 mt-8 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
                         <i class="fas fa-save"></i> Simpan Layanan Baru
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        {{-- KODE MODAL POP-UP TAMBAH PESANAN MANUAL --}}
+        <div x-show="modalTambahPesananManual" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-opacity">
+            <div @click.outside="modalTambahPesananManual = false" class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full relative transform scale-100 transition-transform overflow-y-auto max-h-[90vh]">
+                
+                {{-- Tombol Close X --}}
+                <button @click="modalTambahPesananManual = false" class="absolute top-4 right-4 bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition font-bold z-10">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <h2 class="text-xl font-black text-[#1D5D8A] mb-2"><i class="fas fa-shopping-cart mr-2"></i>Tambah Pesanan Manual</h2>
+                <p class="text-xs text-gray-500 mb-6 font-medium">Isi data pelanggan dan layanan untuk membuat pesanan langsung dari dashboard admin.</p>
+
+                {{-- Form Kirim Data ke Controller --}}
+                <form action="{{ route('admin.pesanan.store') }}" method="POST" class="space-y-5">
+                    @csrf
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Nama Pelanggan</label>
+                            <input type="text" name="nama_pelanggan" placeholder="Misal: Budi Santoso" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('nama_pelanggan') }}">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Email Pelanggan</label>
+                                <input type="email" name="email" placeholder="email@example.com" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('email') }}">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">No. HP</label>
+                                <input type="text" name="no_hp" placeholder="0812xxxx" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('no_hp') }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Alamat Pengambilan</label>
+                            <textarea name="alamat" rows="3" placeholder="Jl. Contoh No. 1, Jakarta" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('alamat') }}</textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Jenis Layanan</label>
+                                <select name="id_layanan" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">
+                                    <option value="" disabled selected>Pilih layanan</option>
+                                    @foreach($daftar_layanan as $layanan)
+                                        <option value="{{ $layanan->id_layanan }}" {{ old('id_layanan') == $layanan->id_layanan ? 'selected' : '' }}>{{ $layanan->nama_layanan }} - Rp {{ number_format($layanan->harga_per_kg, 0, ',', '.') }}/kg</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-gray-500 mb-2">Berat (kg)</label>
+                                <input type="number" step="0.1" name="berat" placeholder="1.5" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition" value="{{ old('berat') }}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Catatan (opsional)</label>
+                            <textarea name="catatan" rows="2" placeholder="Contoh: jemput sore ini" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('catatan') }}</textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full text-white py-3.5 rounded-2xl text-sm font-bold shadow-lg transition active:scale-95 flex items-center justify-center gap-2 hover:opacity-90" style="background-color: #005B82;">
+                        <i class="fas fa-save"></i> Simpan Pesanan Manual
                     </button>
                 </form>
 

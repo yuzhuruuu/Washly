@@ -78,10 +78,42 @@
                     <h1 class="text-[22px] font-bold text-gray-800">Overview Dashboard</h1>
                     <p class="text-sm text-gray-500 mt-1 font-medium">Ringkasan operasional Washly hari ini.</p>
                 </div>
-                <button class="w-10 h-10 bg-white rounded-full shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#0074A6] hover:bg-gray-50 transition">
-                    <i class="fas fa-bell"></i>
-                </button>
             </header>
+
+            {{-- Alert Notification --}}
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                    <div class="flex-shrink-0 text-red-500 mt-0.5">
+                        <i class="fas fa-exclamation-circle text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-red-800">Terjadi Kesalahan</h3>
+                        <ul class="text-xs text-red-700 mt-2 space-y-1">
+                            @foreach($errors->all() as $error)
+                                <li>• {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none'" class="flex-shrink-0 text-red-400 hover:text-red-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div x-data="{ show: true }" x-show="show" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3 animate-in fade-in duration-300">
+                    <div class="flex-shrink-0 text-green-500 mt-0.5">
+                        <i class="fas fa-check-circle text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-sm font-bold text-green-800">Berhasil!</h3>
+                        <p class="text-xs text-green-700 mt-1">{{ session('success') }}</p>
+                    </div>
+                    <button @click="show = false; setTimeout(() => show = false, 5000)" class="flex-shrink-0 text-green-400 hover:text-green-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            @endif
 
             {{-- Judul Seksi & Tombol Tambah --}}
             <div class="flex justify-between items-center mb-6">
