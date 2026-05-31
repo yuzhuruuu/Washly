@@ -397,7 +397,6 @@ class PesananController extends Controller
     {
         $request->validate([
             'id_layanan' => 'required|exists:layanans,id_layanan',
-            'alamat' => 'required|string|max:255',
             'berat' => 'required|numeric|min:0.1',
         ]);
 
@@ -405,17 +404,20 @@ class PesananController extends Controller
         $ongkir = $this->getTarifOngkir();
         $totalHarga = intval($layanan->harga_per_kg * $request->berat) + intval($ongkir);
 
-        Pesanan::create([
+        // 🔥 PENTING: Wajib ada "$pesanan =" di depannya ya Sha! 
+        $pesanan = Pesanan::create([
             'id_pelanggan' => auth('pelanggan')->id(),
             'id_layanan' => $request->id_layanan,
-            'alamat' => $request->alamat,
+            'alamat' => auth('pelanggan')->user()->alamat ?? '-', 
             'berat' => $request->berat,
             'status' => 'menunggu_pickup',
             'total_harga' => $totalHarga,
             'tanggal_pesan' => now(),
         ]);
 
-        return redirect()->route('pelanggan.dashboard')->with('success', 'Pesanan dibuat! Kurir akan segera meluncur.');
+        // Karena di atas udah ditampung, sekarang ID-nya bisa kebaca di sini
+        return redirect()->route('pelanggan.pembayaran', $pesanan->id_pesanan ?? $pesanan->id)
+                         ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
     }
 
     public function uploadPembayaran(Request $request, $id)

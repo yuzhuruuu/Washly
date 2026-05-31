@@ -56,17 +56,31 @@
 
         <!-- Form Card -->
         <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 relative overflow-hidden">
-            <!-- Ornamen Dekorasi Bubbly -->
             <div class="absolute top-0 right-0 w-32 h-32 bg-[#00AEEF]/5 rounded-bl-full -z-10"></div>
             
-            <form action="#" method="POST" class="space-y-6">
+            {{-- KONEK BACKEND: Method POST, Tembak rute update, dan kasih @csrf --}}
+            <form action="{{ route('pelanggan.ubah-password.update') }}" method="POST" class="space-y-6">
+                @csrf
                 
+                {{-- ALERT AUTOMATIS JIKA SUKSES / EROR --}}
+                @if(session('success'))
+                    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-semibold mb-4">
+                        ✅ {{ session('success') }}
+                    </div>
+                @endif
+                @if($errors->any())
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-semibold mb-4">
+                        ❌ {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <!-- Password Lama -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Password Saat Ini</label>
                     <div class="relative flex items-center">
                         <i class="fas fa-lock absolute left-4 text-gray-400 pointer-events-none"></i>
-                        <input type="password" class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Masukkan password saat ini">
+                        {{-- WAJIB: name="current_password" --}}
+                        <input type="password" name="current_password" required class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Masukkan password saat ini">
                     </div>
                 </div>
 
@@ -77,9 +91,9 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">Password Baru</label>
                     <div class="relative flex items-center">
                         <i class="fas fa-key absolute left-4 text-gray-400 pointer-events-none"></i>
-                        <input type="password" class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Buat password baru">
+                        {{-- WAJIB: name="password" --}}
+                        <input type="password" name="password" required class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Buat password baru">
                     </div>
-                    <p class="text-xs text-gray-400 mt-2 font-medium"><i class="fas fa-info-circle mr-1"></i>Minimal 8 karakter, kombinasi huruf dan angka.</p>
                 </div>
 
                 <!-- Konfirmasi Password Baru -->
@@ -87,7 +101,8 @@
                     <label class="block text-sm font-bold text-gray-700 mb-2">Konfirmasi Password Baru</label>
                     <div class="relative flex items-center">
                         <i class="fas fa-check-circle absolute left-4 text-gray-400 pointer-events-none"></i>
-                        <input type="password" class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Ketik ulang password baru">
+                        {{-- WAJIB: name="password_confirmation" --}}
+                        <input type="password" name="password_confirmation" required class="w-full bg-[#F8FAFC] border border-gray-200 text-gray-800 text-sm rounded-xl focus:ring-[#0074A6] focus:border-[#0074A6] block pl-12 py-3.5 pr-4 transition" placeholder="Ketik ulang password baru">
                     </div>
                 </div>
 

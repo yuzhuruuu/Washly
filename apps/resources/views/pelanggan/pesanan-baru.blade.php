@@ -49,7 +49,6 @@
               layananId: null,
               harga: 0, 
               berat: 0, 
-              alamat: '',
               pilihLayanan(nama, hrg, id) {
                   this.layanan = nama;
                   this.harga = hrg;
@@ -59,7 +58,8 @@
                   }
               },
               lanjutKeKonfirmasi() {
-                  if(this.berat > 0 && this.layanan !== '' && this.alamat.trim() !== '') {
+                  // VALIDASI ALAMAT SUDAH DIAPUS BIAR PLONG
+                  if(this.berat > 0 && this.layanan !== '') {
                       this.step = 3; 
                       setTimeout(() => {
                           this.$refs.orderForm.submit();
@@ -168,11 +168,7 @@
                     </div>
 
                     <div class="grid grid-cols-1 gap-8">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-800 mb-2">Alamat Pickup</label>
-                            <textarea x-model="alamat" name="alamat" form="orderForm" rows="3" class="w-full rounded-xl border border-gray-200 bg-[#F4F7FB] px-4 py-3 text-sm text-gray-700 focus:border-[#0074A6] focus:ring-2 focus:ring-[#0074A6] focus:outline-none" placeholder="Masukkan alamat lengkap pickup"></textarea>
-                        </div>
-
+                        
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-800 mb-2">Perkiraan Berat (kg)</label>
@@ -233,12 +229,12 @@
                     </div>
 
                     
-                    {{-- Tombol Lanjutkan (Cuma 1x Klik!) --}}
+                    {{-- Tombol Lanjutkan (Bebas dari Alamat!) --}}
                     <button @click="lanjutKeKonfirmasi()"
                             type="button"
                             class="w-full bg-[#005B82] hover:bg-[#004B6D] text-white font-bold py-4 rounded-full transition-all duration-300 shadow-lg shadow-blue-800/20 flex justify-center items-center gap-2.5 active:scale-[0.98]"
-                            :class="(step < 2 || berat === 0 || layananId === null || alamat.trim() === '') ? 'opacity-50 cursor-not-allowed' : ''"
-                            :disabled="step < 2 || berat === 0 || layananId === null || alamat.trim() === '' || step === 3">
+                            :class="(step < 2 || berat === 0 || layananId === null) ? 'opacity-50 cursor-not-allowed' : ''"
+                            :disabled="step < 2 || berat === 0 || layananId === null || step === 3">
                         {{-- Teks berubah jadi memproses pas diklik --}}
                         <span x-text="step === 3 ? 'Memproses...' : 'Lanjutkan'">Lanjutkan</span> 
                         <i class="fas fa-arrow-right text-xs" x-show="step < 3"></i>

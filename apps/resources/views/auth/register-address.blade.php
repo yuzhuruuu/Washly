@@ -35,30 +35,6 @@
             <input type="hidden" name="password" value="{{ request('password') }}">
             <input type="hidden" name="password_confirmation" value="{{ request('password_confirmation') }}">
 
-            {{-- Header Peta --}}
-            <div class="flex justify-between items-end mb-2">
-                <label class="block text-[11px] font-bold text-gray-800">Pilih Lokasi di Peta</label>
-                <button type="button" class="text-[10px] font-bold text-[#0074A6] hover:underline flex items-center gap-1">
-                    <i class="fas fa-crosshairs"></i> Gunakan Lokasi Saat Ini
-                </button>
-            </div>
-
-            {{-- Mockup UI Peta --}}
-            <div class="relative w-full h-48 bg-gray-200 rounded-2xl overflow-hidden mb-5 border border-gray-200 shadow-inner">
-                {{-- Peta OpenStreetMap --}}
-                <iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=110.37%2C-7.05%2C110.47%2C-6.95&amp;layer=mapnik&amp;marker=-7.0%2C110.42" class="w-full h-full object-cover pointer-events-none opacity-80"></iframe>
-
-                {{-- Search Bar Mengambang --}}
-                <div class="absolute top-3 left-3 right-14 bg-white/95 backdrop-blur-sm rounded-lg shadow-sm flex items-center px-3 py-1.5">
-                    <i class="fas fa-search text-gray-400 mr-2 text-xs"></i>
-                    <input type="text" class="w-full text-[11px] bg-transparent border-0 outline-none focus:outline-none focus:ring-0 shadow-none p-0 text-gray-700 placeholder-gray-400" placeholder="Cari lokasi atau jalan...">
-                </div>
-
-                {{-- Pin Peta di Tengah --}}
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none pb-6">
-                    <i class="fas fa-map-marker-alt text-4xl text-[#003B5C] drop-shadow-md"></i>
-                </div>
-            </div>
 
             {{-- Keterangan Alamat --}}
             <div class="mb-6">

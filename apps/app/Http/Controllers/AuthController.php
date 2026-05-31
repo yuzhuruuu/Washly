@@ -43,28 +43,27 @@ class AuthController extends Controller
             $password = $request->input('password');
             $isEmail = filter_var($identity, FILTER_VALIDATE_EMAIL);
 
-            // 1. Coba login sebagai Admin (bisa pakai email/username)
+            // 1. Coba login sebagai Admin (DIPAKSA langsung ke URL dashboard)
             if (Auth::guard('admin')->attempt([($isEmail ? 'email' : 'username') => $identity, 'password' => $password])) {
                 $request->session()->regenerate();
-                return redirect()->intended('/dashboard/admin');
+                return redirect('/dashboard/admin'); // Menggunakan redirect() biasa biar gak loop
             }
 
             // 2. Coba login sebagai Kurir (HANYA BISA PAKAI USERNAME)
-            // Karena tabel kurirs tidak punya kolom email
             if (Auth::guard('kurir')->attempt(['username' => $identity, 'password' => $password])) {
                 $request->session()->regenerate();
-                return redirect()->intended('/dashboard/kurir');
+                return redirect('/dashboard/kurir'); // Menggunakan redirect() biasa
             }
 
-            // 3. Coba login sebagai Pelanggan (bisa pakai email/username)
+            // 3. Coba login sebagai Pelanggan (DIPAKSA langsung ke URL dashboard)
             if (Auth::guard('pelanggan')->attempt([($isEmail ? 'email' : 'username') => $identity, 'password' => $password])) {
                 $request->session()->regenerate();
-                return redirect()->intended('/dashboard/pelanggan');
+                return redirect('/dashboard/pelanggan'); // Menggunakan redirect() biasa
             }
 
             return back()->withErrors([
                 'email' => 'Login gagal! Pastikan username/email dan password benar.',
-            ]);
+            ])->withInput($request->only('email'));
         }
 
     public function showLoginForm()
