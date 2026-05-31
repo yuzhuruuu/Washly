@@ -50,7 +50,7 @@
             </div>
 
             <div class="text-right">
-                <a href="#" class="text-[11px] font-semibold text-[#0074A6] hover:underline">Lupa password?</a>
+                <a href="{{ route('password.request') }}" class="text-[11px] font-semibold text-[#0074A6] hover:underline">Lupa password?</a>
             </div>
 
             <button type="submit" class="w-full flex justify-center items-center bg-gradient-to-r from-[#0085BE] to-[#005B82] hover:from-[#0074A6] hover:to-[#004B6D] text-white font-semibold py-3.5 rounded-full transition-all duration-300 shadow-lg shadow-[#0074A6]/30 mt-2">
