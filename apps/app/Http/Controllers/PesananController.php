@@ -416,8 +416,8 @@ class PesananController extends Controller
         ]);
 
         // Karena di atas udah ditampung, sekarang ID-nya bisa kebaca di sini
-        return redirect()->route('pelanggan.pembayaran', $pesanan->id_pesanan ?? $pesanan->id)
-                         ->with('success', 'Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+        return redirect()->route('pelanggan.status', $pesanan->id_pesanan ?? $pesanan->id)
+                         ->with('success', 'Pesanan berhasil dibuat! Kurir akan segera menjemput. Pantau status pesanan.');
     }
 
     public function uploadPembayaran(Request $request, $id)

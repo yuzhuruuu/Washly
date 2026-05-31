@@ -401,7 +401,7 @@ class PesananController extends Controller
         $ongkir = $this->getTarifOngkir();
         $totalHarga = intval($layanan->harga_per_kg * $request->berat) + intval($ongkir);
 
-        Pesanan::create([
+        $pesanan = Pesanan::create([
             'id_pelanggan' => auth('pelanggan')->id(),
             'id_layanan' => $request->id_layanan,
             'alamat' => $request->alamat,
@@ -411,7 +411,8 @@ class PesananController extends Controller
             'tanggal_pesan' => now(),
         ]);
 
-        return redirect()->route('pelanggan.dashboard')->with('success', 'Pesanan dibuat! Kurir akan segera meluncur.');
+        return redirect()->route('pelanggan.status', $pesanan->id_pesanan ?? $pesanan->id)
+                         ->with('success', 'Pesanan dibuat! Kurir akan segera meluncur. Pantau status pesanan.');
     }
 
     public function uploadPembayaran(Request $request, $id)
