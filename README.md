@@ -1,12 +1,12 @@
-# 🧺 Washly - Laundry Booking System (Web-Based)
+# Washly - Laundry Booking System (Web-Based)
 
-## 📌 Deskripsi Proyek
+## Deskripsi Proyek
 
 **Washly** adalah aplikasi berbasis web yang dirancang untuk membantu digitalisasi layanan laundry UMKM. Sistem ini memungkinkan pelanggan melakukan pemesanan layanan laundry secara online, mempermudah pengelolaan operasional oleh admin, serta mengatur distribusi tugas penjemputan dan pengantaran oleh kurir secara efisien.
 
 ---
 
-## 🎯 Tujuan
+## Tujuan
 
 * Mempermudah proses booking laundry tanpa harus manual (chat/telepon).
 * Mengurangi kesalahan pencatatan melalui sistem database terpusat.
@@ -15,7 +15,7 @@
 
 ---
 
-## 👨‍💻 Tim Pengembang
+## Tim Pengembang
 
 Proyek ini dikembangkan oleh:
 
@@ -30,30 +30,30 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## 🚀 Fitur Utama
+## Fitur Utama
 
-### 👤 User (Pelanggan)
+### User (Pelanggan)
 
 * Registrasi dan login akun.
 * Melakukan booking laundry (jenis layanan, estimasi berat, alamat).
 * Upload bukti pembayaran.
 * Melihat status pesanan dan riwayat transaksi.
 
-### 🛠️ Admin (Owner)
+### Admin (Owner)
 
 * Dashboard monitoring operasional.
 * Manajemen layanan (CRUD paket & harga).
 * Mengelola pesanan masuk.
 * Menugaskan kurir untuk pickup & delivery.
 
-### 🚚 Kurir
+### Kurir
 
 * Menerima tugas penjemputan dan pengantaran.
 * Update status pekerjaan (pickup/delivery selesai).
 
 ---
 
-## 🔄 Alur Sistem (Workflow)
+## Alur Sistem (Workflow)
 
 1. **Pemesanan:** Pelanggan melakukan booking melalui web.
 2. **Penjemputan:** Admin assign kurir → kurir pickup → status “Dipickup”.
@@ -62,7 +62,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## 🧩 Modul Aplikasi
+## Modul Aplikasi
 
 * **Autentikasi:** Multi-role (Admin, Pelanggan, Kurir).
 * **Transaksi:** Pengelolaan pesanan & pembayaran.
@@ -70,7 +70,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## 🗄️ Struktur Database
+## Struktur Database
 
 * `admins` – data admin
 * `pelanggans` – data pelanggan
@@ -82,7 +82,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## 🛠️ Teknologi
+## Teknologi
 
 * **Frontend:** HTML, CSS, JavaScript, Bootstrap / Tailwind
 * **Bundler:** Vite
@@ -93,7 +93,7 @@ Proyek ini dikembangkan oleh:
 
 ---
 
-## ⚙️ Cara Menjalankan (Local Development)
+## Cara Menjalankan (Local Development)
 
 ### 1. Clone Repository
 
