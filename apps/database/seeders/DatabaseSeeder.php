@@ -3,9 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
-use App\Models\Pelanggan;
-use App\Models\Kurir;
-use App\Models\Layanan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,34 +13,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 1. Eksekusi data layanan dari LayananSeeder yang udah lu buat
         $this->call([
             LayananSeeder::class,
         ]);
 
-        // 1. Buat Data Admin
+        // 2. Buat Data Admin (WAJIB biar lu bisa masuk ke dashboard)
         Admin::create([
             'nama' => 'Admin Washly',
-            'email' => 'admin@washly.com',
+            'username' => 'admin_washly',
+            'email' => 'washly.admin@gmail.com',
             'password' => Hash::make('password123'),
         ]);
-
-        // 2. Buat Data Pelanggan
-        Pelanggan::create([
-            'nama' => 'Zayn Malik',
-            'username' => 'zayn_washly',
-            'email' => 'javvad@gmail.com',
-            'password' => Hash::make('password123'),
-            'no_hp' => '081234567890',
-            'alamat' => 'Banaran, Gunungpati, Semarang',
-        ]);
-
-        // 3. Buat Data Kurir
-        Kurir::create([
-            'nama' => 'Budi Kurir',
-            'username' => 'budi_washly',
-            'password' => Hash::make('password123'),
-            'no_hp' => '08987654321',
-            'status' => 'aktif',
-        ]);
+        
+        // Pelanggan dan Kurir dikosongin total biar nanti daftar sendiri di aplikasi yang udah online!
     }
 }
