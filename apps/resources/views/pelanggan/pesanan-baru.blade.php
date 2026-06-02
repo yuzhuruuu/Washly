@@ -9,40 +9,13 @@
     {{-- Alpine JS buat efek interaktif --}}
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-[#F8FAFC] min-h-screen font-sans text-slate-800 pb-12 antialiased">
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800 pb-12 antialiased">
 
-    {{-- NAVBAR --}}
-    <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center relative">
-            <div class="flex items-center">
-                <img src="{{ asset('images/w-g.svg') }}" alt="Washly" class="h-8">
-            </div>
-
-            <div class="hidden md:flex space-x-10 text-sm font-semibold absolute left-1/2 -translate-x-1/2">
-                <a href="{{ route('pelanggan.dashboard') }}" class="text-gray-400 hover:text-gray-600 transition">Beranda</a>
-                <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-[#0074A6] border-b-2 border-[#0074A6] pb-1">Layanan</a>
-                <a href="{{ route('pelanggan.riwayat') }}" class="text-gray-400 hover:text-gray-600 transition">Riwayat</a>
-                <a href="{{ route('pelanggan.tentang-kami') }}" class="text-gray-400 hover:text-gray-600 transition">Tentang Kami</a>
-            </div>
-
-            <div class="flex items-center space-x-5">
-                <span class="text-sm text-gray-500 font-medium">Halo, {{ Auth::guard('pelanggan')->user()?->nama ?? 'Pelanggan' }}!</span>
-                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-blue-50 overflow-hidden border border-blue-200 block hover:ring-2 hover:ring-[#00AEEF] hover:shadow-md transition-all cursor-pointer">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
-                </a>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold pl-2 border-l border-gray-200 transition">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    @include('pelanggan.partials.navbar')
 
     {{-- KONTEN UTAMA --}}
     {{-- OTAK ALPINE.JS BARU --}}
-    <main class="max-w-[1200px] mx-auto px-6 mt-10" 
+    <main class="max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8" 
           x-data="{ 
               step: 1, 
               layanan: '', 

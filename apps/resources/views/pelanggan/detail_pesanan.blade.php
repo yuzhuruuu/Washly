@@ -4,7 +4,7 @@
     $textStatus = $belumDitimbang ? "Menunggu Timbangan" : "Menunggu Pembayaran";
 @endphp
 
-<div class="p-6 max-w-xl mx-auto bg-white rounded-xl shadow-md space-y-4">
+<div class="p-6 max-w-3xl mx-auto bg-white rounded-xl shadow-md space-y-4">
     <h1 class="text-2xl font-bold">Detail Pesanan #{{ $pesanan->id_pesanan }}</h1>
     
     <div class="p-4 border rounded-lg bg-gray-50">

@@ -8,26 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans text-slate-800 pb-12 antialiased">
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800 pb-12 antialiased">
 
     {{-- NAVBAR HEADER --}}
-    <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between relative">
-            {{-- 🔥 FIX RUTE: Kembali ke halaman buat pesanan baru --}}
-            <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-600 hover:text-gray-900 transition">
-                <i class="fas fa-arrow-left text-lg"></i>
-            </a>
-            <h1 class="text-lg font-bold text-gray-800">Pembayaran</h1>
-            
-            {{-- 🔥 FIX RUTE & DATA PELANGGAN --}}
-            <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner block hover:ring-2 hover:ring-[#00AEEF] hover:shadow-md transition-all">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
-            </a>
+    <nav x-data="{ mobileMenuOpen: false }" class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4 gap-4">
+                <div class="flex items-center gap-3">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition">
+                        <i class="fas fa-bars text-lg"></i>
+                    </button>
+
+                    {{-- 🔥 FIX RUTE: Kembali ke halaman buat pesanan baru --}}
+                    <a href="{{ route('pelanggan.pesanan.baru') }}" class="text-gray-600 hover:text-gray-900 transition">
+                        <i class="fas fa-arrow-left text-lg"></i>
+                    </a>
+                </div>
+
+                <h1 class="text-lg font-bold text-gray-800">Pembayaran</h1>
+                
+                {{-- 🔥 FIX RUTE & DATA PELANGGAN --}}
+                <a href="{{ route('pelanggan.profil') }}" class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300 shadow-inner block hover:ring-2 hover:ring-[#00AEEF] hover:shadow-md transition-all">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::guard('pelanggan')->user()?->nama ?? 'User') }}&background=0074A6&color=fff&bold=true" alt="Avatar" class="w-full h-full object-cover">
+                </a>
+            </div>
+        </div>
+
+        <div x-show="mobileMenuOpen" x-cloak @click.outside="mobileMenuOpen = false" x-transition class="md:hidden border-t border-gray-100 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-2">
+                <a href="{{ route('pelanggan.dashboard') }}" class="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Dashboard</a>
+                <a href="{{ route('pelanggan.pesanan.baru') }}" class="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Pesanan Baru</a>
+                <a href="{{ route('pelanggan.riwayat') }}" class="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Riwayat</a>
+                <a href="{{ route('pelanggan.profil') }}" class="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Profil</a>
+                <a href="{{ route('pelanggan.bantuan') }}" class="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Bantuan</a>
+            </div>
         </div>
     </nav>
 
     {{-- MAIN CONTENT (Alpine State) --}}
-    <main class="max-w-4xl mx-auto px-6 mt-8" 
+    <main class="max-w-5xl lg:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6" 
           x-data="{ 
               tab: 'bank', 
               metodeBank: 'BCA', 
@@ -90,7 +109,7 @@
             </div>
         @enderror
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden pb-8">
+        <div class="bg-white rounded-[2rem] shadow-[0_25px_60px_rgba(15,23,42,0.12)] border border-gray-200 overflow-hidden pb-8">
             
             {{-- TIMER --}}
             <div class="flex justify-center mt-6 mb-4">
@@ -209,7 +228,7 @@
 
                         <template x-if="metodeEwallet === 'QRIS'">
                             <div class="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-xl p-6">
-                                <div class="w-90 h-120 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                                <div class="w-56 h-56 sm:w-64 sm:h-64 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                                     <img src="{{ asset('images/qris.png') }}" alt="QRIS Washly" class="w-full h-full object-contain">
                                 </div>
                                 <p class="text-xs text-gray-500 text-center">Scan QR Code ini menggunakan aplikasi M-Banking atau E-Wallet Anda.</p>
