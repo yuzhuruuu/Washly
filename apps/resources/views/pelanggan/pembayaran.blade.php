@@ -209,7 +209,7 @@
 
                         <template x-if="metodeEwallet === 'QRIS'">
                             <div class="flex flex-col items-center justify-center bg-gray-50 border border-gray-200 rounded-xl p-6">
-                                <div class="w-40 h-40 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                                <div class="w-90 h-120 bg-white border border-gray-200 shadow-sm p-2 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                                     <img src="{{ asset('images/qris.png') }}" alt="QRIS Washly" class="w-full h-full object-contain">
                                 </div>
                                 <p class="text-xs text-gray-500 text-center">Scan QR Code ini menggunakan aplikasi M-Banking atau E-Wallet Anda.</p>

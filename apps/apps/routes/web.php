@@ -87,3 +87,4 @@ Route::middleware(['auth:kurir'])->prefix('dashboard/kurir')->group(function () 
     Route::any('/pengaturan', [PesananController::class, 'kurirPengaturan'])->name('kurir.pengaturan');
     Route::any('/pengaturan/update', [PesananController::class, 'kurirUpdatePengaturan'])->name('kurir.update.pengaturan');
 });
+
