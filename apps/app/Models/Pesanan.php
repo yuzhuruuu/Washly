@@ -13,8 +13,8 @@ class Pesanan extends Model
     protected $primaryKey = 'id_pesanan';
 
     protected $fillable = [
-        'id_pelanggan', 'id_layanan', 'id_kurir', 'tanggal_pesan', 'berat', 
-        'total_harga', 'bukti_bayar', 'status', 'catatan', 'tanggal_pickup', 'tanggal_selesai'
+        'id_pelanggan', 'id_layanan', 'id_kurir', 'tipe_pesanan', 'tanggal_pesan', 'berat', 
+        'total_harga', 'bukti_bayar', 'status', 'catatan', 'tanggal_pickup', 'tanggal_selesai', 'metode_pembayaran_manual'
     ];
 
     public function pelanggan()

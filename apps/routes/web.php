@@ -68,6 +68,7 @@ Route::middleware(['auth:admin'])->prefix('dashboard/admin')->group(function () 
     Route::delete('/kurir/{id}', [AdminController::class, 'destroyKurir'])->name('admin.kurir.destroy');
     Route::post('/kurir/store', [AdminController::class, 'storeKurir'])->name('admin.kurir.store');
     Route::get('/pembayaran', [PesananController::class, 'adminPembayaran'])->name('admin.pembayaran');
+    Route::post('/pembayaran-manual', [PembayaranController::class, 'storeManual'])->name('admin.pembayaran.manual');
     Route::get('/riwayat', [PesananController::class, 'adminRiwayat'])->name('admin.riwayat');
     Route::get('/riwayat/export', [PesananController::class, 'adminRiwayatExport'])->name('admin.riwayat.export');
     Route::get('/pengaturan', [AdminController::class, 'pengaturan'])->name('admin.pengaturan');

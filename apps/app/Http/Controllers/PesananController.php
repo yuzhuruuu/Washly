@@ -192,42 +192,53 @@ class PesananController extends Controller
         }
 
         $layanan = Layanan::findOrFail($request->id_layanan);
-        $totalHarga = $layanan->harga_per_kg * $request->berat;
-        $ongkir = 5000; // default flat ongkir (pickup-delivery)
-        $totalHarga += intval($ongkir);
+        // Pesanan manual tidak ada ongkos kirim
+        $totalHarga = intval($layanan->harga_per_kg * $request->berat);
 
         Pesanan::create([
             'id_pelanggan' => $pelanggan->id_pelanggan,
             'id_layanan' => $layanan->id_layanan,
-            'status' => 'menunggu_pickup',
+            'tipe_pesanan' => 'manual',
+            'status' => 'manual_menunggu_bayar',
             'berat' => $request->berat,
             'total_harga' => $totalHarga,
             'tanggal_pesan' => now(),
             'catatan' => $request->input('catatan'),
         ]);
 
-        return back()->with('success', 'Pesanan manual berhasil dibuat!');
+        return back()->with('success', 'Pesanan manual berhasil dibuat! Lanjutkan ke pembayaran.');
     }
 
     public function adminPembayaran()
     {
-        $pesananList = \App\Models\Pesanan::with(['pelanggan'])
-                                        ->whereNotNull('bukti_bayar')
+        $pesananList = \App\Models\Pesanan::with(['pelanggan', 'layanan', 'pembayaran'])
                                         ->latest('updated_at')
                                         ->get();
 
-        // 🔥 FILTER PINTAR ALPINE.JS: 
-        // Mengubah status asli database menjadi filter tab (dikonfirmasi/ditolak/belum)
         $pesananList->map(function($pesanan) {
-            $s = strtolower($pesanan->status);
-            
-            if (strpos($s, 'proses') !== false || strpos($s, 'selesai') !== false || strpos($s, 'delivery') !== false || strpos($s, 'diambil') !== false) {
+            $statusDatabase = strtolower($pesanan->status);
+            if ($pesanan->pembayaran?->status_pembayaran === 'valid') {
                 $pesanan->status_pembayaran = 'dikonfirmasi';
-            } elseif (strpos($s, 'batal') !== false || strpos($s, 'tolak') !== false) {
+            } elseif ($pesanan->pembayaran?->status_pembayaran === 'ditolak') {
+                $pesanan->status_pembayaran = 'ditolak';
+            } elseif ($pesanan->tipe_pesanan === 'manual' && in_array($pesanan->status, ['manual_menunggu_bayar', 'menunggu_bayar'])) {
+                $pesanan->status_pembayaran = 'belum';
+            } elseif (strpos($statusDatabase, 'batal') !== false || strpos($statusDatabase, 'tolak') !== false) {
                 $pesanan->status_pembayaran = 'ditolak';
             } else {
                 $pesanan->status_pembayaran = 'belum';
             }
+
+            $pesanan->order_type_label = $pesanan->tipe_pesanan === 'manual' ? 'Manual' : 'Regular';
+            $pesanan->payment_method_label = $pesanan->pembayaran->metode_pembayaran ?? ($pesanan->tipe_pesanan === 'manual' ? 'Belum Bayar' : 'Belum Upload');
+            $pesanan->payment_method_icon = match($pesanan->payment_method_label) {
+                'cash' => 'fa-money-bill',
+                'qris' => 'fa-qrcode',
+                'transfer_bank' => 'fa-university',
+                'ewalet_qris' => 'fa-wallet',
+                default => 'fa-money-bill-wave',
+            };
+
             return $pesanan;
         });
 

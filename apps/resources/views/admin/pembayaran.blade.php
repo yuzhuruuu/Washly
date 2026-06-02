@@ -82,6 +82,10 @@
                 @endif
             </div>
 
+            <h2 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-receipt mr-2"></i> Semua Pesanan & Pembayaran
+            </h2>
+
             <div class="flex flex-wrap gap-3 mb-8">
                 <button @click="filter = 'semua'" :class="filter === 'semua' ? 'bg-[#0074A6] text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'" class="px-5 py-2 rounded-full text-xs font-bold transition">Semua</button>
                 <button @click="filter = 'belum'" :class="filter === 'belum' ? 'bg-[#0074A6] text-white shadow-md' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'" class="px-5 py-2 rounded-full text-xs font-bold transition">Belum Dikonfirmasi</button>
@@ -90,82 +94,118 @@
             </div>
 
             <div class="space-y-4">
-                
-                    @forelse($pesananList ?? [] as $pesanan)
+                @forelse($pesananList ?? [] as $pesanan)
                     @php
                         $nama = $pesanan->pelanggan->nama ?? 'Unknown';
                         $kata = explode(' ', $nama);
                         $inisial = strtoupper(substr($kata[0], 0, 1) . (isset($kata[1]) ? substr($kata[1], 0, 1) : ''));
-                        
                         $warna = ['bg-blue-100 text-[#0074A6]', 'bg-cyan-100 text-cyan-600', 'bg-orange-100 text-orange-600', 'bg-indigo-100 text-indigo-500', 'bg-pink-100 text-pink-500'];
                         $warnaPilih = $warna[crc32($nama) % count($warna)];
 
-                        // 🔥 REVISI: Mengambil Kategori Murni dari Controller (gak pake in_array lagi)
-                        $kategoriFilter = $pesanan->status_pembayaran ?? 'belum'; 
-                        
-                        // Menentukan text visual di badge status
+                        $kategoriFilter = $pesanan->status_pembayaran ?? 'belum';
                         if ($kategoriFilter === 'dikonfirmasi') {
                             $statusLabel = 'Dikonfirmasi';
                         } elseif ($kategoriFilter === 'ditolak') {
                             $statusLabel = 'Ditolak';
+                        } elseif ($pesanan->tipe_pesanan === 'manual' && in_array($pesanan->status, ['manual_menunggu_bayar', 'menunggu_bayar'])) {
+                            $statusLabel = 'Menunggu Bayar';
                         } else {
                             $statusLabel = 'Menunggu Konfirmasi';
                         }
 
-                        $metode = $pesanan->metode_pembayaran ?? 'Transfer';
-                        $iconMetode = (stripos($metode, 'gopay') !== false || stripos($metode, 'ovo') !== false || stripos($metode, 'dana') !== false) ? 'fa-wallet' : 'fa-university';
+                        $metode = $pesanan->payment_method_label ?? 'Belum Bayar';
+                        $iconMetode = 'fa-money-bill-wave';
+                        if (stripos($metode, 'cash') !== false) {
+                            $iconMetode = 'fa-money-bill';
+                        } elseif (stripos($metode, 'qris') !== false) {
+                            $iconMetode = 'fa-qrcode';
+                        } elseif (stripos($metode, 'transfer') !== false) {
+                            $iconMetode = 'fa-university';
+                        } elseif (stripos($metode, 'ewalet') !== false) {
+                            $iconMetode = 'fa-wallet';
+                        }
 
-                        $buktiLink = $pesanan->bukti_bayar ? asset('storage/' . str_replace('public/', '', $pesanan->bukti_bayar)) : '#';
+                        $buktiLink = '#';
+                        if (!empty($pesanan->pembayaran?->bukti_bayar)) {
+                            $buktiLink = asset('storage/' . str_replace('public/', '', $pesanan->pembayaran->bukti_bayar));
+                        } elseif (!empty($pesanan->bukti_bayar)) {
+                            $buktiLink = asset('storage/' . str_replace('public/', '', $pesanan->bukti_bayar));
+                        }
                     @endphp
 
-                    <div x-show="filter === 'semua' || filter === '{{ $kategoriFilter }}'" class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition gap-4">
-                        
-                        <div class="flex items-center gap-4 w-[200px] shrink-0">
-                            <div class="w-10 h-10 rounded-full {{ $warnaPilih }} flex items-center justify-center text-lg font-bold shrink-0">{{ $inisial }}</div>
-                            <div>
-                                <h3 class="font-bold text-gray-800 text-sm whitespace-nowrap truncate w-[140px]" title="{{ $nama }}">{{ $nama }}</h3>
-                                <p class="text-[9px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider whitespace-nowrap"># WS-{{ date('Y') }}-{{ str_pad($pesanan->id_pesanan ?? $pesanan->id, 3, '0', STR_PAD_LEFT) }}</p>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 flex justify-center overflow-x-auto no-scrollbar">
-                            <div class="bg-slate-50 border border-slate-100 rounded-full py-2 px-6 flex items-center justify-between gap-8 min-w-[300px]">
-                                <div>
-                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Nominal</p>
-                                    <p class="text-sm font-black text-[#0074A6] whitespace-nowrap">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Metode</p>
-                                    <div class="flex items-center gap-2 text-gray-700 font-semibold text-xs whitespace-nowrap">
-                                        <i class="fas {{ $iconMetode }} text-[#0074A6]"></i> {{ $metode }}
+                    <div x-show="filter === 'semua' || filter === '{{ $kategoriFilter }}'" class="bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="grid grid-cols-1 md:grid-cols-[minmax(250px,1fr)_auto] gap-4 items-center">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full {{ $warnaPilih }} flex items-center justify-center text-lg font-bold shrink-0">{{ $inisial }}</div>
+                                <div class="min-w-0">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate" title="{{ $nama }}">{{ $nama }}</h3>
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em] mt-1"># WS-{{ date('Y') }}-{{ str_pad($pesanan->id_pesanan, 3, '0', STR_PAD_LEFT) }}</p>
+                                    <div class="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.14em] font-bold">
+                                        <span class="px-2 py-1 rounded-full bg-slate-100 text-slate-600">{{ $pesanan->order_type_label ?? ($pesanan->tipe_pesanan === 'manual' ? 'Manual' : 'Regular') }}</span>
+                                        <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700">{{ $pesanan->layanan->nama_layanan ?? 'Layanan' }}</span>
                                     </div>
                                 </div>
-                                
-                                {{-- REVISI: Mengubah tag <a> menjadi <button> pemicu Alpine.js Modal --}}
-                                <button type="button" @click="modalOpen = true; imageSrc = '{{ $buktiLink }}'" title="Lihat Bukti Transfer" class="w-9 h-9 bg-[#C5E1E1] rounded-lg flex items-center justify-center text-teal-800 cursor-pointer hover:opacity-80 transition shadow-sm shrink-0">
-                                    <i class="fas fa-file-invoice text-sm"></i>
-                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700">
+                                <div class="bg-slate-50 rounded-2xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.18em]">Total</p>
+                                    <p class="font-black text-gray-900">Rp {{ number_format($pesanan->total_harga ?? 0, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-2xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.18em]">Status</p>
+                                    <p class="font-bold {{ $kategoriFilter === 'dikonfirmasi' ? 'text-green-700' : ($kategoriFilter === 'ditolak' ? 'text-red-600' : 'text-orange-600') }}">{{ $statusLabel }}</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-2xl p-3">
+                                    <p class="text-[10px] text-gray-400 uppercase tracking-[0.18em]">Metode</p>
+                                    <p class="font-semibold text-gray-900 flex items-center gap-2"><i class="fas {{ $iconMetode }}"></i> {{ ucfirst($metode) }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-col gap-2 w-24 shrink-0 justify-center">
-                        @if($kategoriFilter === 'belum')
-                            <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan ?? $pesanan->id) }}" method="POST" class="m-0 p-0">
-                                @csrf
-                                @method('PATCH')
-                                {{-- Pastikan ini status_pembayaran --}}
-                                <input type="hidden" name="status_pembayaran" value="Lunas"> 
-                                <button type="submit" class="w-full bg-[#0074A6] hover:bg-[#005B82] text-white py-1.5 rounded-full text-[11px] font-bold transition shadow-sm cursor-pointer">Konfirmasi</button>
-                            </form>
+                        <div class="mt-4 flex flex-wrap gap-3 items-center justify-between">
+                            <div class="text-[11px] text-gray-500">
+                                <span class="font-bold">Berat:</span> {{ $pesanan->berat ?? 0 }} kg • <span class="font-bold">Status Pesanan:</span> {{ $pesanan->status }}
+                            </div>
 
-                            <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan ?? $pesanan->id) }}" method="POST" class="m-0 p-0">
-                                @csrf
-                                @method('PATCH')
-                                {{-- Pastikan ini status_pembayaran --}}
-                                <input type="hidden" name="status_pembayaran" value="Ditolak">
-                                <button type="submit" class="w-full bg-red-100 hover:bg-red-200 text-red-600 py-1.5 rounded-full text-[11px] font-bold transition cursor-pointer">Tolak</button>
-                            </form>
-                        @endif
+                            <div class="flex flex-wrap gap-2">
+                                @if($pesanan->tipe_pesanan === 'manual' && in_array($pesanan->status, ['manual_menunggu_bayar', 'menunggu_bayar']))
+                                    <div x-data="{ open: false }" class="relative">
+                                        <button @click="open = true" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-bold transition">Terima Bayar</button>
+                                        <div x-show="open" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm">
+                                            <div @click.outside="open = false" class="bg-white p-6 rounded-2xl shadow-2xl max-w-xs w-full">
+                                                <h3 class="text-lg font-bold text-gray-800 mb-4">Pilih Metode Pembayaran</h3>
+                                                <form action="{{ route('admin.pembayaran.manual') }}" method="POST" class="space-y-3">
+                                                    @csrf
+                                                    <input type="hidden" name="id_pesanan" value="{{ $pesanan->id_pesanan }}">
+                                                    <button type="submit" name="metode_pembayaran" value="cash" class="w-full bg-green-100 border-2 border-green-500 hover:bg-green-200 text-green-700 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                                        <i class="fas fa-money-bill text-xl"></i> Tunai (Cash)
+                                                    </button>
+                                                    <button type="submit" name="metode_pembayaran" value="qris" class="w-full bg-blue-100 border-2 border-blue-500 hover:bg-blue-200 text-blue-700 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                                                        <i class="fas fa-qrcode text-xl"></i> QRIS
+                                                    </button>
+                                                    <button type="button" @click="open = false" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-xl font-semibold transition">
+                                                        Batal
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @elseif($kategoriFilter === 'belum' && !in_array($pesanan->tipe_pesanan, ['manual']))
+                                    <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan) }}" method="POST" class="inline-flex gap-2">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status_pembayaran" value="Lunas">
+                                        <button type="submit" class="bg-[#0074A6] hover:bg-[#005B82] text-white px-4 py-2 rounded-full text-xs font-bold transition">Konfirmasi</button>
+                                    </form>
+                                    <form action="{{ route('admin.pesanan.update', $pesanan->id_pesanan) }}" method="POST" class="inline-flex">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="status_pembayaran" value="Ditolak">
+                                        <button type="submit" class="bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-full text-xs font-bold transition">Tolak</button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @empty
@@ -176,7 +216,6 @@
                         <p class="text-gray-500 font-semibold">Belum ada data pembayaran yang masuk.</p>
                     </div>
                 @endforelse
-
             </div>
 
         </div>

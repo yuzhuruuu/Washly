@@ -331,7 +331,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Alamat Pengambilan</label>
+                            <label class="block text-[11px] font-bold text-gray-500 mb-2">Alamat</label>
                             <textarea name="alamat" rows="3" placeholder="Jl. Contoh No. 1, Jakarta" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('alamat') }}</textarea>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,7 +351,7 @@
                         </div>
                         <div>
                             <label class="block text-[11px] font-bold text-gray-500 mb-2">Catatan (opsional)</label>
-                            <textarea name="catatan" rows="2" placeholder="Contoh: jemput sore ini" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('catatan') }}</textarea>
+                            <textarea name="catatan" rows="2" placeholder="Contoh: Diambil besok" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#1D5D8A] transition">{{ old('catatan') }}</textarea>
                         </div>
                     </div>
 

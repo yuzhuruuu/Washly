@@ -48,4 +48,41 @@ class PembayaranController extends Controller
 
         return redirect()->back()->with('success', 'Pembayaran Berhasil Dikonfirmasi!');
     }
+
+    /**
+     * Proses pembayaran manual oleh admin untuk pesanan tipe manual
+     * Admin input metode pembayaran (cash/qris) langsung tanpa upload bukti
+     */
+    public function storeManual(Request $request)
+    {
+        $request->validate([
+            'id_pesanan' => 'required|exists:pesanans,id_pesanan',
+            'metode_pembayaran' => 'required|in:cash,qris',
+        ]);
+
+        $pesanan = \App\Models\Pesanan::findOrFail($request->id_pesanan);
+
+        // Pastikan ini pesanan manual
+        if ($pesanan->tipe_pesanan !== 'manual') {
+            return back()->with('error', 'Pesanan ini bukan tipe manual.');
+        }
+
+        // Buat record pembayaran
+        \App\Models\Pembayaran::create([
+            'id_pesanan' => $request->id_pesanan,
+            'metode_pembayaran' => $request->metode_pembayaran,
+            'status_pembayaran' => 'valid',
+            'tanggal_bayar' => now(),
+            'bukti_bayar' => null,
+        ]);
+
+        // Update status pesanan jadi selesai langsung dan simpan metode pembayaran
+        $pesanan->update([
+            'status' => 'Selesai',
+            'metode_pembayaran_manual' => $request->metode_pembayaran,
+            'tanggal_selesai' => now()
+        ]);
+
+        return back()->with('success', 'Pembayaran manual berhasil disimpan! Pesanan selesai.');
+    }
 }
