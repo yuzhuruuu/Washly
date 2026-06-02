@@ -113,15 +113,24 @@
                             $statusLabel = 'Menunggu Konfirmasi';
                         }
 
-                        $metode = $pesanan->payment_method_label ?? 'Belum Bayar';
+                        if (!empty($pesanan->pembayaran?->metode_pembayaran)) {
+                            $metode = $pesanan->pembayaran->metode_pembayaran;
+                        } elseif (!empty($pesanan->metode_pembayaran_manual)) {
+                            $metode = ucfirst($pesanan->metode_pembayaran_manual);
+                        } elseif (!empty($pesanan->payment_method_label)) {
+                            $metode = $pesanan->payment_method_label;
+                        } else {
+                            $metode = 'Belum Upload';
+                        }
+
                         $iconMetode = 'fa-money-bill-wave';
                         if (stripos($metode, 'cash') !== false) {
                             $iconMetode = 'fa-money-bill';
                         } elseif (stripos($metode, 'qris') !== false) {
                             $iconMetode = 'fa-qrcode';
-                        } elseif (stripos($metode, 'transfer') !== false) {
+                        } elseif (stripos($metode, 'bca') !== false || stripos($metode, 'bni') !== false || stripos($metode, 'transfer') !== false) {
                             $iconMetode = 'fa-university';
-                        } elseif (stripos($metode, 'ewalet') !== false) {
+                        } elseif (stripos($metode, 'gopay') !== false || stripos($metode, 'dana') !== false || stripos($metode, 'shopeepay') !== false || stripos($metode, 'ewalet') !== false) {
                             $iconMetode = 'fa-wallet';
                         }
 
@@ -169,6 +178,12 @@
                             </div>
 
                             <div class="flex flex-wrap gap-2">
+                                @if(!empty($buktiLink) && $buktiLink !== '#')
+                                    <button type="button" @click="modalOpen = true; imageSrc = '{{ $buktiLink }}'" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-full text-xs font-semibold transition">
+                                        Lihat Bukti
+                                    </button>
+                                @endif
+
                                 @if($pesanan->tipe_pesanan === 'manual' && in_array($pesanan->status, ['manual_menunggu_bayar', 'menunggu_bayar']))
                                     <div x-data="{ open: false }" class="relative">
                                         <button @click="open = true" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-bold transition">Terima Bayar</button>

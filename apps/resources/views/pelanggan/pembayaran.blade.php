@@ -238,8 +238,10 @@
                 </div>
 
                 {{-- 🔥 FORM KIRIM GAMBAR (DI BUNGKUS KE CONTROLLER) 🔥 --}}
-                <form action="{{ route('pelanggan.upload.pembayaran', $pesanan->id_pesanan ?? $pesanan->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('pembayaran.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="id_pesanan" value="{{ $pesanan->id_pesanan ?? $pesanan->id }}">
+                    <input type="hidden" name="metode_pembayaran" :value="tab === 'bank' ? metodeBank : metodeEwallet">
                     
                     {{-- AREA UPLOAD --}}
                     <div class="relative border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 p-8 flex flex-col items-center justify-center hover:bg-gray-100 transition-colors mb-8 group overflow-hidden">

@@ -133,10 +133,16 @@ class PesananController extends Controller
         // 🔥 JALUR KHUSUS: Mengubah Status Pesanan via Form Konfirmasi Pembayaran
         if ($request->has('status_pembayaran')) {
             $statusBaru = ($request->status_pembayaran == 'Lunas') ? 'Sedang Diproses' : 'Menunggu Pembayaran';
-            
+
+            if ($pembayaran = $pesanan->pembayaran) {
+                $pembayaran->update([
+                    'status_pembayaran' => $request->status_pembayaran == 'Lunas' ? 'valid' : 'ditolak'
+                ]);
+            }
+
             $pesanan->update(['status' => $statusBaru]);
-            
-            return back()->with('success', 'Status pesanan berhasil diupdate ke: ' . $statusBaru);
+
+            return back()->with('success', 'Status pembayaran berhasil diupdate ke: ' . ($request->status_pembayaran == 'Lunas' ? 'Dikonfirmasi' : 'Ditolak'));
         }
 
         // 🔥 JALUR KELOLA PESANAN MANUAL
@@ -230,12 +236,14 @@ class PesananController extends Controller
             }
 
             $pesanan->order_type_label = $pesanan->tipe_pesanan === 'manual' ? 'Manual' : 'Regular';
-            $pesanan->payment_method_label = $pesanan->pembayaran->metode_pembayaran ?? ($pesanan->tipe_pesanan === 'manual' ? 'Belum Bayar' : 'Belum Upload');
-            $pesanan->payment_method_icon = match($pesanan->payment_method_label) {
+            $pesanan->payment_method_label = $pesanan->pembayaran->metode_pembayaran ?? ($pesanan->tipe_pesanan === 'manual' ? 'Belum Bayar' : (!empty($pesanan->bukti_bayar) ? 'Bukti Terkirim' : 'Belum Upload'));
+            $pesanan->payment_method_icon = match(strtolower($pesanan->payment_method_label)) {
                 'cash' => 'fa-money-bill',
                 'qris' => 'fa-qrcode',
                 'transfer_bank' => 'fa-university',
                 'ewalet_qris' => 'fa-wallet',
+                'bca', 'bni' => 'fa-university',
+                'gopay', 'dana', 'shopeepay' => 'fa-wallet',
                 default => 'fa-money-bill-wave',
             };
 

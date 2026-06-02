@@ -16,7 +16,7 @@ class PembayaranController extends Controller
     {
         $request->validate([
             'id_pesanan' => 'required',
-            'metode_pembayaran' => 'required|in:transfer_bank,ewalet_qris',
+            'metode_pembayaran' => 'required|in:BCA,BNI,GOPAY,DANA,ShopeePay,QRIS',
             'bukti_bayar' => 'required|image|mimes:jpg,png,jpeg|max:2048', // Max 2MB
         ]);
 
